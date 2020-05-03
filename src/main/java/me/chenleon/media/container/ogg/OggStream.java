@@ -15,16 +15,16 @@ public class OggStream {
     }
 
     public boolean hasNextPage() throws IOException {
-        int i = 0;
-        while (i < CAPTURE_PATTERN.length) {
+        int posOfPattern = 0;
+        while (posOfPattern < CAPTURE_PATTERN.length) {
             int b = in.read();
             if (b == -1) {
                 return false;
             }
-            if (b == CAPTURE_PATTERN[i]) {
-                i++;
+            if (b == CAPTURE_PATTERN[posOfPattern]) {
+                posOfPattern++;
             } else {
-                i = (b == CAPTURE_PATTERN[0] ? 1 : 0);
+                posOfPattern = (b == CAPTURE_PATTERN[0] ? 1 : 0);
             }
         }
         return true;

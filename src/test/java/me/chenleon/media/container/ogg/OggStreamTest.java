@@ -1,4 +1,4 @@
-package me.chenleon.media.audio;
+package me.chenleon.media.container.ogg;
 
 import me.chenleon.media.container.ogg.OggPage;
 import me.chenleon.media.container.ogg.OggStream;
