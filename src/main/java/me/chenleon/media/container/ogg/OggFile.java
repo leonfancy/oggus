@@ -2,16 +2,20 @@ package me.chenleon.media.container.ogg;
 
 import com.google.common.io.LittleEndianDataInputStream;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
-public class OggStream {
+public class OggFile {
     private static final int MAX_SEG_LEN = 255;
     private static final byte[] CAPTURE_PATTERN = {'O', 'g', 'g', 'S'};
     private LittleEndianDataInputStream in;
 
-    public OggStream(InputStream in) {
-        this.in = new LittleEndianDataInputStream(in);
+    public OggFile(String filePath) throws FileNotFoundException {
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filePath));
+        this.in = new LittleEndianDataInputStream(bufferedInputStream);
+    }
+
+    public OggFile(InputStream inputStream) {
+        this.in = new LittleEndianDataInputStream(inputStream);
     }
 
     public boolean hasNextPage() throws IOException {

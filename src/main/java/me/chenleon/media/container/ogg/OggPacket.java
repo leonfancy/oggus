@@ -12,4 +12,12 @@ public class OggPacket {
         this.data = data;
         this.isPartial = isPartial;
     }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public boolean isPartial() {
+        return isPartial;
+    }
 }

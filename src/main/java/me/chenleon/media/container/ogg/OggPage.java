@@ -88,4 +88,8 @@ public class OggPage {
     public void addOggPacket(OggPacket oggPacket) {
         this.oggPackets.add(oggPacket);
     }
+
+    public ArrayList<OggPacket> getOggPackets() {
+        return oggPackets;
+    }
 }

@@ -1,23 +1,20 @@
 package me.chenleon.media.container.ogg;
 
-import me.chenleon.media.container.ogg.OggPage;
-import me.chenleon.media.container.ogg.OggStream;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class OggStreamTest {
+class OggFileTest {
     @Test
     void shouldReadOggPage() throws IOException {
-        DataInputStream inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream("audio/technology.opus")));
-        OggStream oggStream = new OggStream(inputStream);
+        OggFile oggFile = new OggFile("audio/technology.opus");
 
         int pageCount = 0;
 
-        while (oggStream.hasNextPage()) {
-            OggPage page = oggStream.nextPage();
+        while (oggFile.hasNextPage()) {
+            OggPage page = oggFile.nextPage();
             pageCount += 1;
 
             System.out.println("verion: " + page.getVersion());
@@ -42,7 +39,7 @@ class OggStreamTest {
     void shouldCorrectSearchCapturePattern() throws IOException {
         byte[] bytes = {'O', 'g', 'O', 'g', 'g', 'S'};
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-        OggStream oggStream = new OggStream(inputStream);
-        assertTrue(oggStream.hasNextPage());
+        OggFile oggFile = new OggFile(inputStream);
+        assertTrue(oggFile.hasNextPage());
     }
 }
