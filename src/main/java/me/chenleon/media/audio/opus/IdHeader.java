@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class IdHeader {
-    public static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd'};
+    private static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd'};
     private final int majorVersion;
     private final int minorVersion;
     private final int channelCount;
