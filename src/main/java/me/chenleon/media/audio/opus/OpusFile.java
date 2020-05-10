@@ -15,6 +15,11 @@ public class OpusFile {
     private final IdHeader idHeader;
 
     public OpusFile(OggFile oggFile) throws IOException {
+        idHeader = readIdHeader(oggFile);
+        commentHeader = readCommentHeader(oggFile);
+    }
+
+    private IdHeader readIdHeader(OggFile oggFile) throws IOException {
         if (!oggFile.hasNextPage()) {
             throw new InvalidOpusException("No ID Header data in this opus file");
         }
@@ -28,8 +33,12 @@ public class OpusFile {
         if(oggPacket.isPartial()) {
             throw new InvalidOpusException("ID Header data is corrupted");
         }
-        this.idHeader = new IdHeader(oggPacket.getData());
+        return new IdHeader(oggPacket.getData());
+    }
 
+    private CommentHeader readCommentHeader(OggFile oggFile) throws IOException {
+        OggPage currentPage;
+        ArrayList<OggPacket> currentPagePackets;
         byte[] commentHeaderData = new byte[0];
         while(oggFile.hasNextPage()) {
             currentPage = oggFile.nextPage();
@@ -40,7 +49,7 @@ public class OpusFile {
             commentHeaderData = Bytes.concat(commentHeaderData, currentPagePackets.get(0).getData());
             if(currentPage.getGranulePosition() == 0) break;
         }
-        commentHeader = new CommentHeader(commentHeaderData);
+        return new CommentHeader(commentHeaderData);
     }
 
     public IdHeader getIdHeader() {
