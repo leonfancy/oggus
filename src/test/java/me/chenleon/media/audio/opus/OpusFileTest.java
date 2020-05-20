@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,22 @@ class OpusFileTest {
         Map<String, Collection<String>> tags = opusFile.getTags();
         for (String key : tags.keySet()) {
             System.out.printf("- %s=%s\n", key, tags.get(key).stream().collect(Collectors.joining(",")));
+        }
+
+        int count = 1;
+        while (true) {
+            AudioDataPacket audioDataPacket = opusFile.readAudioDataPacket();
+            if(audioDataPacket == null) {
+                break;
+            }
+            System.out.println("Audio Data Packet: " + count);
+            for (OpusPacket opusPacket : audioDataPacket.getOpusPackets()) {
+                Config config = opusPacket.getConfig();
+                System.out.printf("Bandwidth: %d Hz, Mode: %s, Frame Size: %.1f ms, Code: %d, Frame Count: %d, Channel: %s\n",
+                        config.getBandwidth().getHz(), config.getEncodeMode(), config.getFrameSize(),
+                        opusPacket.getCode(), opusPacket.getFrames().size(), opusPacket.isMono() ? "mono" : "stereo");
+            }
+            count++;
         }
     }
 }

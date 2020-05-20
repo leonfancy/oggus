@@ -1,6 +1,7 @@
 package me.chenleon.media.container.ogg;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class OggPage {
     Integer version;
@@ -11,7 +12,7 @@ public class OggPage {
     Integer checkSum;
     Integer segCount;
     private byte[] segTable;
-    private ArrayList<OggPacket> oggPackets = new ArrayList<>();
+    private LinkedList<OggPacket> oggPackets = new LinkedList<>();
 
     public Integer getVersion() {
         return version;
@@ -89,7 +90,7 @@ public class OggPage {
         this.oggPackets.add(oggPacket);
     }
 
-    public ArrayList<OggPacket> getOggPackets() {
+    public LinkedList<OggPacket> getOggPackets() {
         return oggPackets;
     }
 }

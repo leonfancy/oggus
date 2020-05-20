@@ -1,7 +1,9 @@
 package me.chenleon.media.container.ogg;
 
+import com.google.common.primitives.Bytes;
+
 public class OggPacket {
-    private byte[] data;
+    private final byte[] data;
     private final boolean isPartial;
 
     public OggPacket(byte[] data) {
@@ -19,5 +21,9 @@ public class OggPacket {
 
     public boolean isPartial() {
         return isPartial;
+    }
+
+    public OggPacket concat(OggPacket other) {
+        return new OggPacket(Bytes.concat(data, other.data));
     }
 }
