@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 class OpusFileTest {
     @Test
     void shouldReadOggStream() throws IOException {
-        OpusFile opusFile = new OpusFile(new OggFile("audio/technology.opus"));
+        OpusFile opusFile = new OpusFile(new OggFile("audio/hellopeter.opus"));
         IdHeader idHeader = opusFile.getIdHeader();
 
         System.out.printf("Version: %d.%d\n", idHeader.getMajorVersion(), idHeader.getMinorVersion());

@@ -1,18 +1,17 @@
 package me.chenleon.media.container.ogg;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class OggPage {
-    Integer version;
-    Byte flag;
-    Long granulePosition;
-    Long serialNum;
-    Integer seqNum;
-    Integer checkSum;
-    Integer segCount;
+    private Integer version;
+    private Byte flag;
+    private Long granulePosition;
+    private Long serialNum;
+    private Integer seqNum;
+    private Integer checkSum;
+    private Integer segCount;
     private byte[] segTable;
-    private LinkedList<OggPacket> oggPackets = new LinkedList<>();
+    private final LinkedList<OggPacket> oggPackets = new LinkedList<>();
 
     public Integer getVersion() {
         return version;

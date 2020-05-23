@@ -17,7 +17,7 @@ class OggFileTest {
             OggPage page = oggFile.nextPage();
             pageCount += 1;
 
-            System.out.println("verion: " + page.getVersion());
+            System.out.println("version: " + page.getVersion());
             System.out.println("flags: " + (page.isContinued() ? "continued " : "") + (page.isBOS() ? "bos " : "") + (page.isEOS() ? "eos" : ""));
             System.out.println("granule pos: " + page.getGranulePosition());
             System.out.println("serial number: " + String.format("0x%x", page.getSerialNum()));
