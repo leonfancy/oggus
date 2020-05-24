@@ -53,6 +53,21 @@ class OggPageTest {
     }
 
     @Test
+    void shouldCorrectlyReturnIsCompletedStatus() {
+        OggPage oggPage = new OggPage();
+        oggPage.setSegCount(3);
+        oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255 });
+
+        assertFalse(oggPage.isCompleted());
+
+        for (int laceValue = 0; laceValue < 254; laceValue++) {
+            oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) laceValue});
+
+            assertTrue(oggPage.isCompleted());
+        }
+    }
+
+    @Test
     void shouldDumpOggPageToByteArray() {
         OggPage oggPage = new OggPage();
         oggPage.setVersion(0);

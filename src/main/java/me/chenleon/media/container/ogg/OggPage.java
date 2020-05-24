@@ -9,6 +9,7 @@ import java.util.List;
 
 public class OggPage {
     public static final byte[] CAPTURE_PATTERN = {'O', 'g', 'g', 'S'};
+    public static final int MAX_LACE_VALUE = 255;
     private int version;
     private byte flag = 0x00;
     private long granulePosition;
@@ -102,6 +103,10 @@ public class OggPage {
 
     public byte[] getLaceValues() {
         return laceValues;
+    }
+
+    public boolean isCompleted() {
+        return Byte.toUnsignedInt(laceValues[segCount - 1]) < MAX_LACE_VALUE;
     }
 
     public void addOggDataPacket(byte[] data) {

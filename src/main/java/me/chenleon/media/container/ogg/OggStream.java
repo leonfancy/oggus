@@ -5,9 +5,9 @@ import com.google.common.io.LittleEndianDataInputStream;
 import java.io.*;
 
 import static me.chenleon.media.container.ogg.OggPage.CAPTURE_PATTERN;
+import static me.chenleon.media.container.ogg.OggPage.MAX_LACE_VALUE;
 
 public class OggStream {
-    private static final int MAX_LACE_VALUE = 255;
     private LittleEndianDataInputStream in;
 
     /**
