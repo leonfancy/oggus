@@ -1,7 +1,7 @@
 package me.chenleon.media.audio.opus;
 
 import com.google.common.primitives.Bytes;
-import me.chenleon.media.container.ogg.OggFile;
+import me.chenleon.media.container.ogg.OggStream;
 import me.chenleon.media.container.ogg.OggPacket;
 import me.chenleon.media.container.ogg.OggPage;
 
@@ -11,21 +11,21 @@ import java.util.*;
 public class OpusFile {
     private final CommentHeader commentHeader;
     private final IdHeader idHeader;
-    private final OggFile oggFile;
+    private final OggStream oggStream;
     private final Queue<OggPacket> oggPacketBuffer = new LinkedList<>();
 
-    public OpusFile(OggFile oggFile) throws IOException {
-        idHeader = readIdHeader(oggFile);
-        commentHeader = readCommentHeader(oggFile);
-        this.oggFile = oggFile;
+    public OpusFile(OggStream oggStream) throws IOException {
+        idHeader = readIdHeader(oggStream);
+        commentHeader = readCommentHeader(oggStream);
+        this.oggStream = oggStream;
     }
 
-    private IdHeader readIdHeader(OggFile oggFile) throws IOException {
-        if (!oggFile.hasNextPage()) {
+    private IdHeader readIdHeader(OggStream oggStream) throws IOException {
+        if (!oggStream.hasNextPage()) {
             throw new InvalidOpusException("No ID Header data in this opus file");
         }
 
-        OggPage currentPage = oggFile.nextPage();
+        OggPage currentPage = oggStream.nextPage();
         LinkedList<OggPacket> currentPagePackets = currentPage.getOggPackets();
         if (currentPagePackets.size() != 1) {
             throw new InvalidOpusException("First ogg page must only contain 1 data packet");
@@ -37,12 +37,12 @@ public class OpusFile {
         return new IdHeader(oggPacket.getData());
     }
 
-    private CommentHeader readCommentHeader(OggFile oggFile) throws IOException {
+    private CommentHeader readCommentHeader(OggStream oggStream) throws IOException {
         OggPage currentPage;
         LinkedList<OggPacket> currentPagePackets;
         byte[] commentHeaderData = new byte[0];
-        while (oggFile.hasNextPage()) {
-            currentPage = oggFile.nextPage();
+        while (oggStream.hasNextPage()) {
+            currentPage = oggStream.nextPage();
             currentPagePackets = currentPage.getOggPackets();
             if (currentPagePackets.size() != 1) {
                 throw new InvalidOpusException("Comment Header ogg pages must only contain 1 data packet");
@@ -70,8 +70,8 @@ public class OpusFile {
         if (oggPacket != null && !oggPacket.isPartial()) {
             return new AudioDataPacket(oggPacket.getData(), idHeader.getStreamCount());
         }
-        while (oggFile.hasNextPage()) {
-            OggPage oggPage = oggFile.nextPage();
+        while (oggStream.hasNextPage()) {
+            OggPage oggPage = oggStream.nextPage();
             LinkedList<OggPacket> oggPackets = oggPage.getOggPackets();
             if (oggPackets.size() < 1) {
                 throw new InvalidOpusException("At least one packet must be contained in a ogg page");

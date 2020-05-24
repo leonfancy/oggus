@@ -9,12 +9,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class OggFileTest {
     @Test
     void shouldReadOggPage() throws IOException {
-        OggFile oggFile = new OggFile("audio/technology.opus");
+        OggStream oggStream = new OggStream("audio/technology.opus");
 
         int pageCount = 0;
 
-        while (oggFile.hasNextPage()) {
-            OggPage page = oggFile.nextPage();
+        while (oggStream.hasNextPage()) {
+            OggPage page = oggStream.nextPage();
             pageCount += 1;
 
             System.out.println("version: " + page.getVersion());
@@ -25,7 +25,7 @@ class OggFileTest {
             System.out.println("checksum: " + String.format("0x%x", page.getCheckSum()));
             System.out.println("segment count: " + page.getSegCount());
             System.out.print("segment table: ");
-            for (byte b : page.getSegTable()) {
+            for (byte b : page.getLaceValues()) {
                 System.out.print(Byte.toUnsignedInt(b) + " ");
             }
             System.out.println("\n----------------------\n");
@@ -39,7 +39,7 @@ class OggFileTest {
     void shouldCorrectSearchCapturePattern() throws IOException {
         byte[] bytes = {'O', 'g', 'O', 'g', 'g', 'S'};
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-        OggFile oggFile = new OggFile(inputStream);
-        assertTrue(oggFile.hasNextPage());
+        OggStream oggStream = new OggStream(inputStream);
+        assertTrue(oggStream.hasNextPage());
     }
 }
