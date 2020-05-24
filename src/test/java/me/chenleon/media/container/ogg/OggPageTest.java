@@ -28,6 +28,31 @@ class OggPageTest {
     }
 
     @Test
+    void shouldCorrectlySetFlag() {
+        OggPage oggPage = new OggPage();
+        oggPage.setFlag((byte) 0x00);
+
+        oggPage.setContinued();
+        assertTrue(oggPage.isContinued());
+        assertFalse(oggPage.isBOS());
+        assertFalse(oggPage.isEOS());
+
+        oggPage.setFlag((byte) 0x00);
+
+        oggPage.setBOS();
+        assertFalse(oggPage.isContinued());
+        assertTrue(oggPage.isBOS());
+        assertFalse(oggPage.isEOS());
+
+        oggPage.setFlag((byte) 0x00);
+
+        oggPage.setEOS();
+        assertFalse(oggPage.isContinued());
+        assertFalse(oggPage.isBOS());
+        assertTrue(oggPage.isEOS());
+    }
+
+    @Test
     void shouldDumpOggPageToByteArray() {
         OggPage oggPage = new OggPage();
         oggPage.setVersion(0);

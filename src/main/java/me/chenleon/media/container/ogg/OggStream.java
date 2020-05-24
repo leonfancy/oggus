@@ -29,13 +29,14 @@ public class OggStream {
     }
 
     /**
-     * Read an Ogg page
+     * Read an Ogg page.
+     * This method will skip invalid data.
      *
      * @return the next Ogg page, or {@code null} if there isn't page left
      * @throws IOException if an I/O error occurs
      */
     public OggPage readPage() throws IOException {
-        if(hasNextPage()) {
+        if (hasNextPage()) {
             return nextPage();
         }
         return null;
@@ -43,6 +44,7 @@ public class OggStream {
 
     /**
      * Read an Ogg page with the given serial number
+     * This method will skip invalid data.
      *
      * @param serialNum the given serial number
      * @return the next Ogg page, or {@code null} if there isn't page left
@@ -51,7 +53,7 @@ public class OggStream {
     public OggPage readPage(int serialNum) throws IOException {
         while (hasNextPage()) {
             OggPage oggPage = nextPage();
-            if(oggPage.getSerialNum() == serialNum) {
+            if (oggPage.getSerialNum() == serialNum) {
                 return oggPage;
             }
         }

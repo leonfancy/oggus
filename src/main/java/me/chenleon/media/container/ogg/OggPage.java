@@ -10,7 +10,7 @@ import java.util.List;
 public class OggPage {
     public static final byte[] CAPTURE_PATTERN = {'O', 'g', 'g', 'S'};
     private int version;
-    private byte flag;
+    private byte flag = 0x00;
     private long granulePosition;
     private long serialNum;
     private long seqNum;
@@ -36,12 +36,24 @@ public class OggPage {
         return (this.flag & 0x01) != 0;
     }
 
+    public void setContinued() {
+        flag = (byte) (flag | 0x01);
+    }
+
     public boolean isBOS() {
         return (this.flag & 0x02) != 0;
     }
 
+    public void setBOS() {
+        flag = (byte) (flag | 0x02);
+    }
+
     public boolean isEOS() {
         return (this.flag & 0x04) != 0;
+    }
+
+    public void setEOS() {
+        flag = (byte) (flag | 0x04);
     }
 
     public long getGranulePosition() {
@@ -117,8 +129,8 @@ public class OggPage {
             out.write(version);
             out.write(flag);
             out.writeLong(granulePosition);
-            out.writeInt((int)serialNum);
-            out.writeInt((int)seqNum);
+            out.writeInt((int) serialNum);
+            out.writeInt((int) seqNum);
             out.writeInt(checkSum);
             out.write(segCount);
             out.write(laceValues);
