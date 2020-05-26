@@ -8,6 +8,8 @@ import me.chenleon.media.container.ogg.OggPage;
 import java.io.IOException;
 import java.util.*;
 
+import static me.chenleon.media.audio.opus.OpusUtil.isIdHeaderPage;
+
 public class OpusFile {
     private final CommentHeader commentHeader;
     private final IdHeader idHeader;
@@ -21,20 +23,30 @@ public class OpusFile {
     }
 
     private IdHeader readIdHeader(OggStream oggStream) throws IOException {
-        if (!oggStream.hasNextPage()) {
+        OggPage oggPage = readOpusBosPage(oggStream);
+        if (oggPage == null) {
             throw new InvalidOpusException("No ID Header data in this opus file");
         }
 
-        OggPage currentPage = oggStream.nextPage();
-        LinkedList<OggPacket> currentPagePackets = currentPage.getOggPackets();
-        if (currentPagePackets.size() != 1) {
-            throw new InvalidOpusException("First ogg page must only contain 1 data packet");
+        return IdHeader.from(oggPage.getOggDataPackets().get(0));
+    }
+
+    private OggPage readOpusBosPage(OggStream oggStream) throws IOException {
+        while (true) {
+            OggPage oggPage = oggStream.readPage();
+            if (oggPage == null) {
+                return null;
+            }
+
+            if (!oggPage.isBOS() || !isIdHeaderPage(oggPage)) {
+                continue;
+            }
+
+            if (oggPage.getOggDataPackets().size() > 1) {
+                throw new InvalidOpusException("The ID Header Ogg page must NOT contain other data");
+            }
+            return oggPage;
         }
-        OggPacket oggPacket = currentPagePackets.pollFirst();
-        if (oggPacket.isPartial()) {
-            throw new InvalidOpusException("ID Header data is corrupted");
-        }
-        return new IdHeader(oggPacket.getData());
     }
 
     private CommentHeader readCommentHeader(OggStream oggStream) throws IOException {
@@ -89,7 +101,7 @@ public class OpusFile {
                 break;
             }
         }
-        if(oggPacket == null) {
+        if (oggPacket == null) {
             return null;
         }
         return new AudioDataPacket(oggPacket.getData(), idHeader.getStreamCount());

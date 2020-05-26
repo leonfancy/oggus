@@ -113,7 +113,7 @@ public class OggPage {
         oggDataPackets.add(data);
     }
 
-    public List<byte[]> getOggDataPacket() {
+    public List<byte[]> getOggDataPackets() {
         return oggDataPackets;
     }
 

@@ -1,94 +1,62 @@
 package me.chenleon.media.audio.opus;
 
 import com.google.common.io.LittleEndianDataInputStream;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+@Setter
+@Getter
 public class IdHeader {
-    private static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd'};
-    private final int majorVersion;
-    private final int minorVersion;
-    private final int channelCount;
-    private final int preSkip;
-    private final double outputGain;
-    private final int coupledCount;
-    private final long inputSampleRate;
-    private final int channelMappingFamily;
-    private final int streamCount;
-    private final int[] channelMapping;
+    public static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd'};
+    private int majorVersion;
+    private int minorVersion;
+    private int channelCount;
+    private int preSkip;
+    private double outputGain;
+    private int coupledCount;
+    private long inputSampleRate;
+    private int channelMappingFamily;
+    private int streamCount;
+    private int[] channelMapping;
 
-    public IdHeader(byte[] data) throws IOException {
+    private IdHeader() {}
+
+    public static IdHeader from(byte[] data) throws IOException {
+        IdHeader idHeader = new IdHeader();
         LittleEndianDataInputStream in = new LittleEndianDataInputStream(new ByteArrayInputStream(data));
         if(!Arrays.equals(in.readNBytes(8), MAGIC_SIGNATURE)) {
             throw new InvalidOpusException("Id Header Packet not starts with 'OpusHead'");
         }
         byte version = in.readByte();
-        this.majorVersion = version >> 4;
-        this.minorVersion = version & 0x0F;
-        this.channelCount = in.readUnsignedByte();
-        if(channelCount < 1) {
-            throw new InvalidOpusException("Invalid channel count: "  + channelCount);
+        idHeader.majorVersion = version >> 4;
+        idHeader.minorVersion = version & 0x0F;
+        idHeader.channelCount = in.readUnsignedByte();
+        if(idHeader.channelCount < 1) {
+            throw new InvalidOpusException("Invalid channel count: "  + idHeader.channelCount);
         }
-        this.preSkip = in.readUnsignedShort();
-        this.inputSampleRate = Integer.toUnsignedLong(in.readInt());
-        this.outputGain = in.readUnsignedShort() / 256.0;
-        this.channelMappingFamily = in.readUnsignedByte();
-        if (this.channelMappingFamily == 0) {
-            if(this.channelCount > 2) {
-                throw new InvalidOpusException("Channel count must not be more than 2 for channel mapping family 0. Current channel count is: " + channelCount);
+        idHeader.preSkip = in.readUnsignedShort();
+        idHeader.inputSampleRate = Integer.toUnsignedLong(in.readInt());
+        idHeader.outputGain = in.readUnsignedShort() / 256.0;
+        idHeader.channelMappingFamily = in.readUnsignedByte();
+        if (idHeader.channelMappingFamily == 0) {
+            if(idHeader.channelCount > 2) {
+                throw new InvalidOpusException("Channel count must not be more than 2 for channel mapping family 0. Current channel count is: " + idHeader.channelCount);
             }
-            this.streamCount = 1;
-            this.coupledCount = this.channelCount - this.streamCount;
-            this.channelMapping = this.channelCount == 1 ? new int[]{0} : new int[]{0, 1};
+            idHeader.streamCount = 1;
+            idHeader.coupledCount = idHeader.channelCount - idHeader.streamCount;
+            idHeader.channelMapping = idHeader.channelCount == 1 ? new int[]{0} : new int[]{0, 1};
         } else {
-            this.streamCount = in.readUnsignedByte();
-            this.coupledCount = in.readUnsignedByte();
-            channelMapping = new int[this.channelCount];
-            for (int i = 0; i < channelCount; i++) {
-                channelMapping[i] = in.readUnsignedByte();
+            idHeader.streamCount = in.readUnsignedByte();
+            idHeader.coupledCount = in.readUnsignedByte();
+            idHeader.channelMapping = new int[idHeader.channelCount];
+            for (int i = 0; i < idHeader.channelCount; i++) {
+                idHeader.channelMapping[i] = in.readUnsignedByte();
             }
         }
-    }
-
-    public int getMajorVersion() {
-        return majorVersion;
-    }
-
-    public int getMinorVersion() {
-        return minorVersion;
-    }
-
-    public int getChannelCount() {
-        return channelCount;
-    }
-
-    public int getPreSkip() {
-        return preSkip;
-    }
-
-    public long getInputSampleRate() {
-        return inputSampleRate;
-    }
-
-    public double getOutputGain() {
-        return outputGain;
-    }
-
-    public int getChannelMappingFamily() {
-        return this.channelMappingFamily;
-    }
-
-    public int getStreamCount() {
-        return this.streamCount;
-    }
-
-    public int getCoupledCount() {
-        return coupledCount;
-    }
-
-    public int[] getChannelMapping() {
-        return channelMapping;
+        return idHeader;
     }
 }

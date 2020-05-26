@@ -133,6 +133,6 @@ class OggStreamTest {
         assertEquals(expected.getCheckSum(), actual.getCheckSum());
         assertEquals(expected.getSegCount(), actual.getSegCount());
         assertArrayEquals(expected.getLaceValues(), actual.getLaceValues());
-        assertArrayEquals(expected.getOggDataPacket().toArray(), actual.getOggDataPacket().toArray());
+        assertArrayEquals(expected.getOggDataPackets().toArray(), actual.getOggDataPackets().toArray());
     }
 }
