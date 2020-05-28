@@ -11,6 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static java.lang.String.format;
+
 @Setter
 @Getter
 public class IdHeader {
@@ -29,39 +31,48 @@ public class IdHeader {
     private IdHeader() {
     }
 
-    public static IdHeader from(byte[] data) throws IOException {
+    public static IdHeader from(byte[] data) {
         IdHeader idHeader = new IdHeader();
         LittleEndianDataInputStream in = new LittleEndianDataInputStream(new ByteArrayInputStream(data));
-        if (!Arrays.equals(in.readNBytes(8), MAGIC_SIGNATURE)) {
-            throw new InvalidOpusException("Id Header Packet not starts with 'OpusHead'");
-        }
-        byte version = in.readByte();
-        idHeader.majorVersion = version >> 4;
-        idHeader.minorVersion = version & 0x0F;
-        idHeader.channelCount = in.readUnsignedByte();
-        if (idHeader.channelCount < 1) {
-            throw new InvalidOpusException("Invalid channel count: " + idHeader.channelCount);
-        }
-        idHeader.preSkip = in.readUnsignedShort();
-        idHeader.inputSampleRate = Integer.toUnsignedLong(in.readInt());
-        idHeader.outputGain = in.readUnsignedShort() / 256.0;
-        idHeader.channelMappingFamily = in.readUnsignedByte();
-        if (idHeader.channelMappingFamily == 0) {
-            if (idHeader.channelCount > 2) {
-                throw new InvalidOpusException("Channel count must not be more than 2 for channel mapping family 0. Current channel count is: " + idHeader.channelCount);
+        try {
+            if (!Arrays.equals(in.readNBytes(8), MAGIC_SIGNATURE)) {
+                throw new InvalidOpusException("Id Header Packet not starts with 'OpusHead'");
             }
-            idHeader.streamCount = 1;
-            idHeader.coupledCount = idHeader.channelCount - idHeader.streamCount;
-            idHeader.channelMapping = idHeader.channelCount == 1 ? new int[]{0} : new int[]{0, 1};
-        } else {
-            idHeader.streamCount = in.readUnsignedByte();
-            idHeader.coupledCount = in.readUnsignedByte();
-            idHeader.channelMapping = new int[idHeader.channelCount];
-            for (int i = 0; i < idHeader.channelCount; i++) {
-                idHeader.channelMapping[i] = in.readUnsignedByte();
+            byte version = in.readByte();
+            idHeader.majorVersion = version >> 4;
+            idHeader.minorVersion = version & 0x0F;
+            idHeader.channelCount = in.readUnsignedByte();
+            if (idHeader.channelCount < 1) {
+                throw new InvalidOpusException("Invalid channel count: " + idHeader.channelCount);
             }
+            idHeader.preSkip = in.readUnsignedShort();
+            idHeader.inputSampleRate = Integer.toUnsignedLong(in.readInt());
+            idHeader.outputGain = in.readUnsignedShort() / 256.0;
+            idHeader.channelMappingFamily = in.readUnsignedByte();
+            if (idHeader.channelMappingFamily == 0) {
+                if (idHeader.channelCount > 2) {
+                    throw new InvalidOpusException(format("Invalid channel count: %d, for channel mapping family 0",
+                            idHeader.channelCount));
+                }
+                idHeader.streamCount = 1;
+                idHeader.coupledCount = idHeader.channelCount - idHeader.streamCount;
+                idHeader.channelMapping = idHeader.channelCount == 1 ? new int[]{0} : new int[]{0, 1};
+            } else {
+                if (idHeader.channelMappingFamily == 1 && idHeader.channelCount > 8) {
+                    throw new InvalidOpusException(format("Invalid channel count: %d, for channel mapping family 1",
+                            idHeader.channelCount));
+                }
+                idHeader.streamCount = in.readUnsignedByte();
+                idHeader.coupledCount = in.readUnsignedByte();
+                idHeader.channelMapping = new int[idHeader.channelCount];
+                for (int i = 0; i < idHeader.channelCount; i++) {
+                    idHeader.channelMapping[i] = in.readUnsignedByte();
+                }
+            }
+            return idHeader;
+        } catch (IOException e) {
+            throw new InvalidOpusException("Id Header data is corrupted");
         }
-        return idHeader;
     }
 
     public static IdHeader emptyHeader() {
