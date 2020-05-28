@@ -1,10 +1,13 @@
 package me.chenleon.media.audio.opus;
 
 import com.google.common.io.LittleEndianDataInputStream;
+import com.google.common.io.LittleEndianDataOutputStream;
 import lombok.Getter;
 import lombok.Setter;
+import me.chenleon.media.container.ogg.DumpException;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -23,27 +26,28 @@ public class IdHeader {
     private int streamCount;
     private int[] channelMapping;
 
-    private IdHeader() {}
+    private IdHeader() {
+    }
 
     public static IdHeader from(byte[] data) throws IOException {
         IdHeader idHeader = new IdHeader();
         LittleEndianDataInputStream in = new LittleEndianDataInputStream(new ByteArrayInputStream(data));
-        if(!Arrays.equals(in.readNBytes(8), MAGIC_SIGNATURE)) {
+        if (!Arrays.equals(in.readNBytes(8), MAGIC_SIGNATURE)) {
             throw new InvalidOpusException("Id Header Packet not starts with 'OpusHead'");
         }
         byte version = in.readByte();
         idHeader.majorVersion = version >> 4;
         idHeader.minorVersion = version & 0x0F;
         idHeader.channelCount = in.readUnsignedByte();
-        if(idHeader.channelCount < 1) {
-            throw new InvalidOpusException("Invalid channel count: "  + idHeader.channelCount);
+        if (idHeader.channelCount < 1) {
+            throw new InvalidOpusException("Invalid channel count: " + idHeader.channelCount);
         }
         idHeader.preSkip = in.readUnsignedShort();
         idHeader.inputSampleRate = Integer.toUnsignedLong(in.readInt());
         idHeader.outputGain = in.readUnsignedShort() / 256.0;
         idHeader.channelMappingFamily = in.readUnsignedByte();
         if (idHeader.channelMappingFamily == 0) {
-            if(idHeader.channelCount > 2) {
+            if (idHeader.channelCount > 2) {
                 throw new InvalidOpusException("Channel count must not be more than 2 for channel mapping family 0. Current channel count is: " + idHeader.channelCount);
             }
             idHeader.streamCount = 1;
@@ -58,5 +62,36 @@ public class IdHeader {
             }
         }
         return idHeader;
+    }
+
+    public static IdHeader emptyHeader() {
+        return new IdHeader();
+    }
+
+    public byte[] dump() {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        LittleEndianDataOutputStream out = new LittleEndianDataOutputStream(byteArrayOutputStream);
+
+        try {
+            out.write(MAGIC_SIGNATURE);
+            out.writeByte(majorVersion << 4 | minorVersion);
+            out.writeByte(channelCount);
+            out.writeShort(preSkip);
+            out.writeInt((int) inputSampleRate);
+            out.writeShort((int) (outputGain * 256));
+            out.writeByte(channelMappingFamily);
+
+            if (channelMappingFamily > 0) {
+                out.writeByte(streamCount);
+                out.writeByte(coupledCount);
+                for (int i = 0; i < channelCount; i++) {
+                    out.writeByte(channelMapping[i]);
+                }
+            }
+        } catch (IOException e) {
+            throw new DumpException("OggPage dump to byte array error", e);
+        }
+
+        return byteArrayOutputStream.toByteArray();
     }
 }
