@@ -3,9 +3,13 @@ package me.chenleon.media.audio.opus;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.LittleEndianDataInputStream;
+import com.google.common.io.LittleEndianDataOutputStream;
+import me.chenleon.media.container.ogg.DumpException;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -81,7 +85,6 @@ public class CommentHeader {
 
     /**
      * Set Vendor
-     *
      */
     public void setVendor(String vendor) {
         this.vendor = vendor;
@@ -92,5 +95,35 @@ public class CommentHeader {
      */
     public void addTag(String key, String value) {
         this.tags.put(key.toUpperCase(), value);
+    }
+
+    /**
+     * Dump {@code CommentHeader} to binary byte array.
+     *
+     * @return the binary data
+     */
+    public byte[] dump() {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        LittleEndianDataOutputStream out = new LittleEndianDataOutputStream(byteArrayOutputStream);
+
+        try {
+            out.write(MAGIC_SIGNATURE);
+            if (vendor == null) {
+                out.writeInt(0);
+            } else {
+                out.writeInt(vendor.length());
+                out.write(vendor.getBytes(StandardCharsets.UTF_8));
+            }
+            out.writeInt(tags.size());
+            for (Map.Entry<String, String> tag : tags.entries()) {
+                String commentString = tag.getKey() + "=" + tag.getValue();
+                out.writeInt(commentString.length());
+                out.write(commentString.getBytes(StandardCharsets.UTF_8));
+            }
+        } catch (IOException e) {
+            throw new DumpException("OggPage dump to byte array error", e);
+        }
+
+        return byteArrayOutputStream.toByteArray();
     }
 }

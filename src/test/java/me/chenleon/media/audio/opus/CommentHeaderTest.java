@@ -114,4 +114,32 @@ class CommentHeaderTest {
         assertEquals("Space Bound", String.join(",", commentHeader.getTags().get("TITLE")));
         assertEquals("Slim,Eminem", String.join(",", commentHeader.getTags().get("ARTIST")));
     }
+
+    @Test
+    void should_dump_the_empty_comment_header_to_byte_array() {
+        CommentHeader commentHeader = CommentHeader.emptyHeader();
+        byte[] expected = {'O', 'p', 'u', 's', 'T', 'a', 'g', 's', 0, 0, 0, 0, 0, 0, 0, 0};
+        assertArrayEquals(expected, commentHeader.dump());
+    }
+
+    @Test
+    void should_dump_a_populated_comment_header_to_byte_array() {
+        CommentHeader commentHeader = CommentHeader.emptyHeader();
+        commentHeader.setVendor("test vendor");
+        commentHeader.addTag("ARTIST", "Slim");
+        commentHeader.addTag("Artist", "Eminem");
+        commentHeader.addTag("TITLE", "Space Bound");
+        byte[] expected = Bytes.concat(
+                new byte[]{'O', 'p', 'u', 's', 'T', 'a', 'g', 's', 11, 0, 0, 0},
+                "test vendor".getBytes(),
+                new byte[]{3, 0, 0, 0},
+                new byte[]{11, 0, 0, 0},
+                "ARTIST=Slim".getBytes(),
+                new byte[]{13, 0, 0, 0},
+                "ARTIST=Eminem".getBytes(),
+                new byte[]{ 17, 0, 0, 0},
+                "TITLE=Space Bound".getBytes()
+        );
+        assertArrayEquals(expected, commentHeader.dump());
+    }
 }
