@@ -79,7 +79,7 @@ class IdHeaderTest {
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
             IdHeader.from(data);
         });
-        assertEquals("Id Header Packet not starts with 'OpusHead'", exception.getMessage());
+        assertEquals("Id Header packet doesn't start with 'OpusHead'", exception.getMessage());
     }
 
     @Test

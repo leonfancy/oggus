@@ -62,7 +62,7 @@ public class OpusFile {
             commentHeaderData = Bytes.concat(commentHeaderData, currentPagePackets.pollFirst().getData());
             if (currentPage.getGranulePosition() == 0) break;
         }
-        return new CommentHeader(commentHeaderData);
+        return CommentHeader.from(commentHeaderData);
     }
 
     public IdHeader getIdHeader() {

@@ -36,7 +36,7 @@ public class IdHeader {
         LittleEndianDataInputStream in = new LittleEndianDataInputStream(new ByteArrayInputStream(data));
         try {
             if (!Arrays.equals(in.readNBytes(8), MAGIC_SIGNATURE)) {
-                throw new InvalidOpusException("Id Header Packet not starts with 'OpusHead'");
+                throw new InvalidOpusException("Id Header packet doesn't start with 'OpusHead'");
             }
             byte version = in.readByte();
             idHeader.majorVersion = version >> 4;
