@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 
 public class CommentHeader {
-    private static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'T', 'a', 'g', 's'};
+    public static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'T', 'a', 'g', 's'};
     private String vendor;
     private final ListMultimap<String, String> tags = ArrayListMultimap.create();
 
@@ -20,7 +20,7 @@ public class CommentHeader {
 
     /**
      * Create {@code CommentHeader} from binary data, the data must start with 'OpusTags'.
-     *
+     * <p>
      * Based on the specification, tag fields are case-insensitive. They are all converted to upper case when parsing
      * from the binary data.
      *
@@ -70,7 +70,7 @@ public class CommentHeader {
 
     private void addTag(byte[] data) {
         String tagStr = new String(data);
-        String[] parts = tagStr.split("=");
+        String[] parts = tagStr.split("=", 2);
         tags.put(parts[0].toUpperCase(), parts[1]);
     }
 }

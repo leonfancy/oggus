@@ -60,6 +60,18 @@ class CommentHeaderTest {
     }
 
     @Test
+    void should_read_tags_with_equal_symbol_in_the_value() {
+        byte[] data = Bytes.concat(
+                new byte[]{'O', 'p', 'u', 's', 'T', 'a', 'g', 's', 0, 0, 0, 0},
+                new byte[]{1, 0, 0, 0, 13, 0, 0, 0},
+                "ARTIST=Em=nem".getBytes()
+        );
+        CommentHeader commentHeader = CommentHeader.from(data);
+        assertEquals(1, commentHeader.getTags().size());
+        assertEquals("Em=nem", String.join(",", commentHeader.getTags().get("ARTIST")));
+    }
+
+    @Test
     void should_throw_exception_given_binary_not_start_with_correct_signature() {
         byte[] data = {'O', 'p', 'u', 's', 'T', 'a', 'g', 'e'};
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
