@@ -41,7 +41,11 @@ public class CommentHeader {
             int tagCount = in.readInt();
             for (int i = 0; i < tagCount; i++) {
                 int tagStrLen = in.readInt();
-                commentHeader.addTag(in.readNBytes(tagStrLen));
+                String tagStr = new String(in.readNBytes(tagStrLen));
+                String[] parts = tagStr.split("=", 2);
+                if (parts.length == 2) {
+                    commentHeader.tags.put(parts[0].toUpperCase(), parts[1]);
+                }
             }
             return commentHeader;
         } catch (IOException e) {
@@ -68,9 +72,4 @@ public class CommentHeader {
         return vendor;
     }
 
-    private void addTag(byte[] data) {
-        String tagStr = new String(data);
-        String[] parts = tagStr.split("=", 2);
-        tags.put(parts[0].toUpperCase(), parts[1]);
-    }
 }
