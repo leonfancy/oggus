@@ -54,6 +54,13 @@ public class CommentHeader {
     }
 
     /**
+     * Create an empty Comment Header.
+     */
+    public static CommentHeader emptyHeader() {
+        return new CommentHeader();
+    }
+
+    /**
      * Get all tags in the comment header. One tag field may have different values, they are store as a collection and
      * share the same key in the returned {@code Map}.
      *
@@ -72,4 +79,18 @@ public class CommentHeader {
         return vendor;
     }
 
+    /**
+     * Set Vendor
+     *
+     */
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
+    }
+
+    /**
+     * Add a tag, the key will be transformed to upper case.
+     */
+    public void addTag(String key, String value) {
+        this.tags.put(key.toUpperCase(), value);
+    }
 }

@@ -100,4 +100,18 @@ class CommentHeaderTest {
         });
         assertEquals("Comment Header data is corrupted", exception.getMessage());
     }
+
+    @Test
+    void should_create_empty_comment_header_and_set_vendor_and_tags() {
+        CommentHeader commentHeader = CommentHeader.emptyHeader();
+        commentHeader.setVendor("test vendor");
+        commentHeader.addTag("ARTIST", "Slim");
+        commentHeader.addTag("Artist", "Eminem");
+        commentHeader.addTag("TITLE", "Space Bound");
+
+        assertEquals("test vendor", commentHeader.getVendor());
+        assertEquals(2, commentHeader.getTags().size());
+        assertEquals("Space Bound", String.join(",", commentHeader.getTags().get("TITLE")));
+        assertEquals("Slim,Eminem", String.join(",", commentHeader.getTags().get("ARTIST")));
+    }
 }
