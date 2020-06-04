@@ -121,7 +121,7 @@ public class CommentHeader {
                 out.write(commentString.getBytes(StandardCharsets.UTF_8));
             }
         } catch (IOException e) {
-            throw new DumpException("OggPage dump to byte array error", e);
+            throw new DumpException("CommentHeader dump to byte array error", e);
         }
 
         return byteArrayOutputStream.toByteArray();

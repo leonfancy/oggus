@@ -100,7 +100,7 @@ public class IdHeader {
                 }
             }
         } catch (IOException e) {
-            throw new DumpException("OggPage dump to byte array error", e);
+            throw new DumpException("IdHeader dump to byte array error", e);
         }
 
         return byteArrayOutputStream.toByteArray();

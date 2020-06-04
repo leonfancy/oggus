@@ -36,7 +36,7 @@ class OpusFileTest {
         int count = 1;
         while (true) {
             AudioDataPacket audioDataPacket = opusFile.readAudioDataPacket();
-            if(audioDataPacket == null) {
+            if (audioDataPacket == null) {
                 break;
             }
             System.out.println("Audio Data Packet: " + count);

@@ -137,7 +137,7 @@ class CommentHeaderTest {
                 "ARTIST=Slim".getBytes(),
                 new byte[]{13, 0, 0, 0},
                 "ARTIST=Eminem".getBytes(),
-                new byte[]{ 17, 0, 0, 0},
+                new byte[]{17, 0, 0, 0},
                 "TITLE=Space Bound".getBytes()
         );
         assertArrayEquals(expected, commentHeader.dump());

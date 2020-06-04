@@ -12,4 +12,13 @@ public class OpusUtil {
         byte[] data = oggPage.getOggDataPackets().get(0);
         return Arrays.equals(data, 0, 7, IdHeader.MAGIC_SIGNATURE, 0, 7);
     }
+
+    public static byte[] frameLengthToBytes(int n) {
+        if (n <= 251) {
+            return new byte[]{(byte) n};
+        }
+        int x = 252 + n % 4;
+        int y = (n - x) / 4;
+        return new byte[]{(byte) x, (byte) y};
+    }
 }

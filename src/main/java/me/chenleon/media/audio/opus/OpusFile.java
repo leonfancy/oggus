@@ -1,12 +1,15 @@
 package me.chenleon.media.audio.opus;
 
 import com.google.common.primitives.Bytes;
-import me.chenleon.media.container.ogg.OggStream;
 import me.chenleon.media.container.ogg.OggPacket;
 import me.chenleon.media.container.ogg.OggPage;
+import me.chenleon.media.container.ogg.OggStream;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 import static me.chenleon.media.audio.opus.OpusUtil.isIdHeaderPage;
 

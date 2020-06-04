@@ -12,18 +12,18 @@ class OggPageTest {
     void shouldCorrectlyParseFlag() {
         OggPage oggPage = new OggPage();
 
-        oggPage.setFlag((byte)0x00);
+        oggPage.setFlag((byte) 0x00);
         assertFalse(oggPage.isContinued());
         assertFalse(oggPage.isBOS());
         assertFalse(oggPage.isEOS());
 
-        oggPage.setFlag((byte)0x01);
+        oggPage.setFlag((byte) 0x01);
         assertTrue(oggPage.isContinued());
 
-        oggPage.setFlag((byte)0x02);
+        oggPage.setFlag((byte) 0x02);
         assertTrue(oggPage.isBOS());
 
-        oggPage.setFlag((byte)0x04);
+        oggPage.setFlag((byte) 0x04);
         assertTrue(oggPage.isEOS());
     }
 
@@ -56,7 +56,7 @@ class OggPageTest {
     void shouldCorrectlyReturnIsCompletedStatus() {
         OggPage oggPage = new OggPage();
         oggPage.setSegCount(3);
-        oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255 });
+        oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255});
 
         assertFalse(oggPage.isCompleted());
 
@@ -71,13 +71,13 @@ class OggPageTest {
     void shouldDumpOggPageToByteArray() {
         OggPage oggPage = new OggPage();
         oggPage.setVersion(0);
-        oggPage.setFlag((byte)0x01);
+        oggPage.setFlag((byte) 0x01);
         oggPage.setGranulePosition(257);
         oggPage.setSerialNum(0xffffffff);
         oggPage.setSeqNum(1025);
         oggPage.setCheckSum(0);
         oggPage.setSegCount(3);
-        oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255 });
+        oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255});
 
         byte[] dataPacket1 = new byte[456];
         Arrays.fill(dataPacket1, (byte) 1);

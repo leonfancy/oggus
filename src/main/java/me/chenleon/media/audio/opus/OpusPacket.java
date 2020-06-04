@@ -4,35 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * An Opus packet that described in RFC6716
+ * An Opus packet that described in <a href=https://tools.ietf.org/html/rfc6716>RFC6716</a>.
  */
-public class OpusPacket {
-    private Config config;
-    private boolean isMono;
-    private int code;
-    private final List<byte[]> frames = new LinkedList<>();
-
-    public OpusPacket(Config config, boolean isMono, int code) {
-        this.config = config;
-        this.isMono = isMono;
-        this.code = code;
-    }
-
-    private OpusPacket() {
-    }
-
-    /**
-     * Create {@code OpusPacket} from TOC byte.
-     *
-     * @param toc the TOC byte
-     */
-    public static OpusPacket from(byte toc) {
-        OpusPacket opusPacket = new OpusPacket();
-        opusPacket.config = Config.of(toc >> 3);
-        opusPacket.isMono = (toc & 0x04) == 0;
-        opusPacket.code = toc & 0x03;
-        return opusPacket;
-    }
+public abstract class OpusPacket {
+    protected Config config;
+    protected boolean isMono;
+    protected final List<byte[]> frames = new LinkedList<>();
 
     /**
      * Add one frame to this Opus packet.
@@ -60,18 +37,59 @@ public class OpusPacket {
     }
 
     /**
-     * {@code code} should be 0 to 3 which stored in last two bits of TOC byte.
-     *
-     * @return the code of this packet.
-     */
-    public int getCode() {
-        return code;
-    }
-
-    /**
      * @return the list of frame data in this Opus packet.
      */
     public List<byte[]> getFrames() {
         return frames;
+    }
+
+    /**
+     * Code should be 0 to 3 which stored in last two bits of TOC byte.
+     *
+     * @return the code of this packet.
+     */
+    public abstract int getCode();
+
+    public abstract boolean isVbr();
+
+    public abstract boolean hasPadding();
+
+    public abstract int getFrameCount();
+
+    public abstract int getPaddingLength();
+
+    public void setVbr(boolean isVbr) {
+        throw new IllegalStateException("Code 0 to 2 Opus packet doesn't support setting Vbr flag");
+    }
+
+    public void setHasPadding(boolean hasPadding) {
+        throw new IllegalStateException("Code 0 to 2 packet doesn't support setting padding flag");
+    }
+
+    public void setFrameCount(int frameCount) {
+        throw new IllegalStateException("Code 0 to 2 packet doesn't support setting frame count");
+    }
+
+    public void setPaddingLength(int paddingLength) {
+        throw new IllegalStateException("Code 0 to 2 packet doesn't support setting padding length");
+    }
+
+    /**
+     * Dump Opus packet to standard binary.
+     */
+    public abstract byte[] dumpToStandardFormat();
+
+    /**
+     * Dump Opus packet to self delimited binary.
+     */
+    public abstract byte[] dumpToSelfDelimitedFormat();
+
+    protected int getTocByte() {
+        int toc = config.getId() << 3;
+        if (!isMono) {
+            toc = toc & 0x04;
+        }
+        toc = toc & getCode();
+        return toc;
     }
 }
