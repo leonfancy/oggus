@@ -53,7 +53,7 @@ class CodeThreePacket extends OpusPacket {
     }
 
     @Override
-    public byte[] dumpToSelfDelimitedFormat() {
+    public byte[] dumpToSelfDelimitingFormat() {
         return new byte[0];
     }
 }

@@ -29,11 +29,19 @@ public abstract class OpusPacket {
         return config;
     }
 
+    public void setConfig(Config config) {
+        this.config = config;
+    }
+
     /**
      * @return {@code true} if this is mono stream.
      */
     public boolean isMono() {
         return isMono;
+    }
+
+    public void setMono(boolean mono) {
+        isMono = mono;
     }
 
     /**
@@ -82,14 +90,14 @@ public abstract class OpusPacket {
     /**
      * Dump Opus packet to self delimited binary.
      */
-    public abstract byte[] dumpToSelfDelimitedFormat();
+    public abstract byte[] dumpToSelfDelimitingFormat();
 
     protected int getTocByte() {
         int toc = config.getId() << 3;
         if (!isMono) {
-            toc = toc & 0x04;
+            toc = toc | 0x04;
         }
-        toc = toc & getCode();
+        toc = toc | getCode();
         return toc;
     }
 }

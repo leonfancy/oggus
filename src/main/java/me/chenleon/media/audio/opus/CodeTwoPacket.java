@@ -9,9 +9,6 @@ import java.io.IOException;
  * An Opus packet that described in RFC6716
  */
 class CodeTwoPacket extends OpusPacket {
-    protected CodeTwoPacket() {
-    }
-
     @Override
     public int getCode() {
         return 2;
@@ -55,7 +52,7 @@ class CodeTwoPacket extends OpusPacket {
     }
 
     @Override
-    public byte[] dumpToSelfDelimitedFormat() {
+    public byte[] dumpToSelfDelimitingFormat() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {

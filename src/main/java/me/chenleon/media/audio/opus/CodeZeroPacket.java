@@ -6,9 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 class CodeZeroPacket extends OpusPacket {
-    protected CodeZeroPacket() {
-    }
-
     @Override
     public int getCode() {
         return 0;
@@ -51,7 +48,7 @@ class CodeZeroPacket extends OpusPacket {
     }
 
     @Override
-    public byte[] dumpToSelfDelimitedFormat() {
+    public byte[] dumpToSelfDelimitingFormat() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
