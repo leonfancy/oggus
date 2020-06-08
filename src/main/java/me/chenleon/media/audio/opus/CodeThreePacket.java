@@ -58,8 +58,10 @@ class CodeThreePacket extends OpusPacket {
 
         try {
             out.write(getTocByte());
-            for (int i = 0; i < frames.size() - 1; i++) {
-                out.write(OpusUtil.frameLengthToBytes(frames.get(i).length));
+            if (isVbr) {
+                for (int i = 0; i < frames.size() - 1; i++) {
+                    out.write(OpusUtil.frameLengthToBytes(frames.get(i).length));
+                }
             }
             for (byte[] frame : frames) {
                 out.write(frame);
@@ -77,8 +79,12 @@ class CodeThreePacket extends OpusPacket {
 
         try {
             out.write(getTocByte());
-            for (byte[] frame : frames) {
-                out.write(OpusUtil.frameLengthToBytes(frame.length));
+            if (isVbr) {
+                for (byte[] frame : frames) {
+                    out.write(OpusUtil.frameLengthToBytes(frame.length));
+                }
+            } else {
+                out.write(OpusUtil.frameLengthToBytes(frames.get(0).length));
             }
             for (byte[] frame : frames) {
                 out.write(frame);
