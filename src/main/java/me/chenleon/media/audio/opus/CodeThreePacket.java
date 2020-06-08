@@ -1,5 +1,10 @@
 package me.chenleon.media.audio.opus;
 
+import me.chenleon.media.container.ogg.DumpException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 class CodeThreePacket extends OpusPacket {
     private boolean isVbr;
     private boolean hasPadding;
@@ -49,11 +54,39 @@ class CodeThreePacket extends OpusPacket {
 
     @Override
     public byte[] dumpToStandardFormat() {
-        return new byte[0];
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            out.write(getTocByte());
+            for (int i = 0; i < frames.size() - 1; i++) {
+                out.write(OpusUtil.frameLengthToBytes(frames.get(i).length));
+            }
+            for (byte[] frame : frames) {
+                out.write(frame);
+            }
+        } catch (IOException e) {
+            throw new DumpException("OpusPacket dump to byte array error", e);
+        }
+
+        return out.toByteArray();
     }
 
     @Override
     public byte[] dumpToSelfDelimitingFormat() {
-        return new byte[0];
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            out.write(getTocByte());
+            for (byte[] frame : frames) {
+                out.write(OpusUtil.frameLengthToBytes(frame.length));
+            }
+            for (byte[] frame : frames) {
+                out.write(frame);
+            }
+        } catch (IOException e) {
+            throw new DumpException("OpusPacket dump to byte array error", e);
+        }
+
+        return out.toByteArray();
     }
 }
