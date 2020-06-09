@@ -22,8 +22,8 @@ class CodeOnePacketTest {
         OpusPacket opusPacket = OpusPackets.newPacketOfCode(1);
         opusPacket.setConfig(Config.of(12));
         opusPacket.setMono(false);
-        byte[] frameData1 = TestUtil.createFrameData(513, (byte) 1);
-        byte[] frameData2 = TestUtil.createFrameData(513, (byte) 2);
+        byte[] frameData1 = TestUtil.createBinary(513, (byte) 1);
+        byte[] frameData2 = TestUtil.createBinary(513, (byte) 2);
         opusPacket.addFrame(frameData1);
         opusPacket.addFrame(frameData2);
         byte[] standardBytes = opusPacket.dumpToStandardFormat();

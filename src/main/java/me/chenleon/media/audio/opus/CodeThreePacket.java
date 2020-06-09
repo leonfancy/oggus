@@ -58,6 +58,9 @@ class CodeThreePacket extends OpusPacket {
 
         try {
             out.write(getTocByte());
+            if (hasPadding) {
+                out.write(paddingLength);
+            }
             if (isVbr) {
                 for (int i = 0; i < frames.size() - 1; i++) {
                     out.write(OpusUtil.frameLengthToBytes(frames.get(i).length));
@@ -66,10 +69,12 @@ class CodeThreePacket extends OpusPacket {
             for (byte[] frame : frames) {
                 out.write(frame);
             }
+            if (hasPadding) {
+                out.writeBytes(new byte[paddingLength]);
+            }
         } catch (IOException e) {
             throw new DumpException("OpusPacket dump to byte array error", e);
         }
-
         return out.toByteArray();
     }
 
@@ -79,6 +84,9 @@ class CodeThreePacket extends OpusPacket {
 
         try {
             out.write(getTocByte());
+            if (hasPadding) {
+                out.write(paddingLength);
+            }
             if (isVbr) {
                 for (byte[] frame : frames) {
                     out.write(OpusUtil.frameLengthToBytes(frame.length));
@@ -88,6 +96,9 @@ class CodeThreePacket extends OpusPacket {
             }
             for (byte[] frame : frames) {
                 out.write(frame);
+            }
+            if (hasPadding) {
+                out.writeBytes(new byte[paddingLength]);
             }
         } catch (IOException e) {
             throw new DumpException("OpusPacket dump to byte array error", e);

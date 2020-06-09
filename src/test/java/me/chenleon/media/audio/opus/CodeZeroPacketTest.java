@@ -22,7 +22,7 @@ class CodeZeroPacketTest {
         OpusPacket opusPacket = OpusPackets.newPacketOfCode(0);
         opusPacket.setConfig(Config.of(12));
         opusPacket.setMono(false);
-        byte[] frameData = TestUtil.createFrameData(513, (byte) 1);
+        byte[] frameData = TestUtil.createBinary(513, (byte) 1);
         opusPacket.addFrame(frameData);
         byte[] standardBytes = opusPacket.dumpToStandardFormat();
         assertArrayEquals(Bytes.concat(new byte[]{100}, frameData), standardBytes);
