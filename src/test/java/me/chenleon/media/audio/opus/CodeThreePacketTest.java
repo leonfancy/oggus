@@ -97,4 +97,70 @@ class CodeThreePacketTest {
         assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
         assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
     }
+
+    @Test
+    void should_dump_to_standard_and_self_delimiting_format_given_packet_with_padding_length_255() {
+        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
+        opusPacket.setConfig(Config.of(12));
+        opusPacket.setMono(false);
+        opusPacket.setVbr(false);
+        opusPacket.setFrameCount(1);
+        opusPacket.setHasPadding(true);
+        opusPacket.setPaddingLength(255);
+
+        byte[] frameData1 = TestUtil.createBinary(513, (byte) 1);
+
+        opusPacket.addFrame(frameData1);
+
+        byte[] padding = TestUtil.createBinary(254, (byte) 0);
+        byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 0}, frameData1, padding);
+        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 0, (byte) 253, 65}, frameData1, padding);
+
+        assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
+        assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
+    }
+
+    @Test
+    void should_dump_to_standard_and_self_delimiting_format_given_packet_with_padding_length_256() {
+        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
+        opusPacket.setConfig(Config.of(12));
+        opusPacket.setMono(false);
+        opusPacket.setVbr(false);
+        opusPacket.setFrameCount(1);
+        opusPacket.setHasPadding(true);
+        opusPacket.setPaddingLength(256);
+
+        byte[] frameData1 = TestUtil.createBinary(513, (byte) 1);
+
+        opusPacket.addFrame(frameData1);
+
+        byte[] padding = TestUtil.createBinary(255, (byte) 0);
+        byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 1}, frameData1, padding);
+        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 1, (byte) 253, 65}, frameData1, padding);
+
+        assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
+        assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
+    }
+
+    @Test
+    void should_dump_to_standard_and_self_delimiting_format_given_packet_with_padding_length_511() {
+        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
+        opusPacket.setConfig(Config.of(12));
+        opusPacket.setMono(false);
+        opusPacket.setVbr(false);
+        opusPacket.setFrameCount(1);
+        opusPacket.setHasPadding(true);
+        opusPacket.setPaddingLength(511);
+
+        byte[] frameData1 = TestUtil.createBinary(513, (byte) 1);
+
+        opusPacket.addFrame(frameData1);
+
+        byte[] padding = TestUtil.createBinary(509, (byte) 0);
+        byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, (byte) 255, 1}, frameData1, padding);
+        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, (byte) 255, 1, (byte) 253, 65}, frameData1, padding);
+
+        assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
+        assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
+    }
 }
