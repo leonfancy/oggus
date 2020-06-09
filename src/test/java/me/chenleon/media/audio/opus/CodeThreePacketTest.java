@@ -41,10 +41,10 @@ class CodeThreePacketTest {
         opusPacket.addFrame(frameData2);
         opusPacket.addFrame(frameData3);
 
-        byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, (byte) 131, (byte) 253, 65, (byte) 254, 65}, frameData1,
-                frameData2, frameData3);
-        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, (byte) 131, (byte) 253, 65, (byte) 254, 65, (byte) 255,
-                65}, frameData1, frameData2, frameData3);
+        byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, (byte) 131, (byte) 253, 65, (byte) 254, 65},
+                frameData1, frameData2, frameData3);
+        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, (byte) 131, (byte) 253, 65, (byte) 254, 65,
+                (byte) 255, 65}, frameData1, frameData2, frameData3);
 
         assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
         assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
@@ -92,7 +92,8 @@ class CodeThreePacketTest {
 
         byte[] padding = TestUtil.createBinary(length, (byte) 0);
         byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, 65, (byte) length}, frameData1, padding);
-        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) length, (byte) 253, 65}, frameData1, padding);
+        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) length, (byte) 253, 65},
+                frameData1, padding);
 
         assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
         assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
@@ -114,7 +115,8 @@ class CodeThreePacketTest {
 
         byte[] padding = TestUtil.createBinary(254, (byte) 0);
         byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 0}, frameData1, padding);
-        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 0, (byte) 253, 65}, frameData1, padding);
+        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 0, (byte) 253, 65},
+                frameData1, padding);
 
         assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
         assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
@@ -136,7 +138,8 @@ class CodeThreePacketTest {
 
         byte[] padding = TestUtil.createBinary(255, (byte) 0);
         byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 1}, frameData1, padding);
-        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 1, (byte) 253, 65}, frameData1, padding);
+        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, 1, (byte) 253, 65},
+                frameData1, padding);
 
         assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
         assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
@@ -157,8 +160,10 @@ class CodeThreePacketTest {
         opusPacket.addFrame(frameData1);
 
         byte[] padding = TestUtil.createBinary(509, (byte) 0);
-        byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, (byte) 255, 1}, frameData1, padding);
-        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, (byte) 255, 1, (byte) 253, 65}, frameData1, padding);
+        byte[] expectedStandardBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, (byte) 255, 1},
+                frameData1, padding);
+        byte[] expectedSelfDelimitingBytes = Bytes.concat(new byte[]{103, 65, (byte) 255, (byte) 255, 1, (byte) 253,
+                65}, frameData1, padding);
 
         assertArrayEquals(expectedStandardBytes, opusPacket.dumpToStandardFormat());
         assertArrayEquals(expectedSelfDelimitingBytes, opusPacket.dumpToSelfDelimitingFormat());
