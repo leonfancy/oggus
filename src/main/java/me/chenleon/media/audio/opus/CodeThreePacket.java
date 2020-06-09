@@ -1,9 +1,6 @@
 package me.chenleon.media.audio.opus;
 
-import me.chenleon.media.container.ogg.DumpException;
-
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 class CodeThreePacket extends OpusPacket {
     private boolean isVbr;
@@ -55,25 +52,21 @@ class CodeThreePacket extends OpusPacket {
     @Override
     public byte[] dumpToStandardFormat() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        try {
-            out.write(getTocByte());
-            if (hasPadding) {
-                out.write(paddingLength);
+        out.write(getTocByte());
+        out.write(getFrameCountByte());
+        if (hasPadding) {
+            out.write(paddingLength);
+        }
+        if (isVbr) {
+            for (int i = 0; i < frames.size() - 1; i++) {
+                out.writeBytes(OpusUtil.frameLengthToBytes(frames.get(i).length));
             }
-            if (isVbr) {
-                for (int i = 0; i < frames.size() - 1; i++) {
-                    out.write(OpusUtil.frameLengthToBytes(frames.get(i).length));
-                }
-            }
-            for (byte[] frame : frames) {
-                out.write(frame);
-            }
-            if (hasPadding) {
-                out.writeBytes(new byte[paddingLength]);
-            }
-        } catch (IOException e) {
-            throw new DumpException("OpusPacket dump to byte array error", e);
+        }
+        for (byte[] frame : frames) {
+            out.writeBytes(frame);
+        }
+        if (hasPadding) {
+            out.writeBytes(new byte[paddingLength]);
         }
         return out.toByteArray();
     }
@@ -82,28 +75,37 @@ class CodeThreePacket extends OpusPacket {
     public byte[] dumpToSelfDelimitingFormat() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        try {
-            out.write(getTocByte());
-            if (hasPadding) {
-                out.write(paddingLength);
-            }
-            if (isVbr) {
-                for (byte[] frame : frames) {
-                    out.write(OpusUtil.frameLengthToBytes(frame.length));
-                }
-            } else {
-                out.write(OpusUtil.frameLengthToBytes(frames.get(0).length));
-            }
+        out.write(getTocByte());
+        out.write(getFrameCountByte());
+        if (hasPadding) {
+            out.write(paddingLength);
+        }
+        if (isVbr) {
             for (byte[] frame : frames) {
-                out.write(frame);
+                out.writeBytes(OpusUtil.frameLengthToBytes(frame.length));
             }
-            if (hasPadding) {
-                out.writeBytes(new byte[paddingLength]);
-            }
-        } catch (IOException e) {
-            throw new DumpException("OpusPacket dump to byte array error", e);
+        } else {
+            out.writeBytes(OpusUtil.frameLengthToBytes(frames.get(0).length));
+        }
+        for (byte[] frame : frames) {
+            out.writeBytes(frame);
+        }
+        if (hasPadding) {
+            out.writeBytes(new byte[paddingLength]);
         }
 
         return out.toByteArray();
+    }
+
+    private byte getFrameCountByte() {
+        int b = 0;
+        if (isVbr) {
+            b = b | 0x80;
+        }
+        if (hasPadding) {
+            b = b | 0x40;
+        }
+        b = b | frameCount;
+        return (byte) b;
     }
 }
