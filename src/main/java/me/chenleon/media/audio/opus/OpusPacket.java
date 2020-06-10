@@ -20,6 +20,9 @@ public abstract class OpusPacket {
         if (getFrameCount() == frames.size()) {
             throw new InvalidOpusException("The number of frames reaches limitation");
         }
+        if (!isVbr() && frames.size() != 0 && frameData.length != frames.get(0).length) {
+            throw new InvalidOpusException("Frame size must be the same in CBR Opus packet");
+        }
         frames.add(frameData);
     }
 

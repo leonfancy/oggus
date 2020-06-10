@@ -1,6 +1,7 @@
 package me.chenleon.media.audio.opus;
 
 import me.chenleon.media.TestUtil;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -34,5 +35,28 @@ class OpusPacketTest {
             opusPacket.addFrame(TestUtil.createBinary(1, (byte) 0));
         });
         assertEquals("The number of frames reaches limitation", exception.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_when_adding_a_frame_with_different_size_to_a_code_1_packet() {
+        OpusPacket opusPacket = OpusPackets.newPacketOfCode(1);
+        opusPacket.addFrame(TestUtil.createBinary(1, (byte) 0));
+        InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
+            opusPacket.addFrame(TestUtil.createBinary(2, (byte) 0));
+        });
+        assertEquals("Frame size must be the same in CBR Opus packet", exception.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_when_adding_a_frame_with_different_size_to_a_cbr_code_3_packet() {
+        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
+        opusPacket.setFrameCount(3);
+        opusPacket.setVbr(false);
+        opusPacket.addFrame(TestUtil.createBinary(1, (byte) 0));
+        opusPacket.addFrame(TestUtil.createBinary(1, (byte) 0));
+        InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
+            opusPacket.addFrame(TestUtil.createBinary(2, (byte) 0));
+        });
+        assertEquals("Frame size must be the same in CBR Opus packet", exception.getMessage());
     }
 }
