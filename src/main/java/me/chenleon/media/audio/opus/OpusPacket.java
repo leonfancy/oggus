@@ -17,6 +17,9 @@ public abstract class OpusPacket {
      * @param frameData the binary data byte array of a frame
      */
     public void addFrame(byte[] frameData) {
+        if (getFrameCount() == frames.size()) {
+            throw new InvalidOpusException("The number of frames reaches limitation");
+        }
         frames.add(frameData);
     }
 
