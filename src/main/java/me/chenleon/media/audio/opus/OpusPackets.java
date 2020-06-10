@@ -27,7 +27,7 @@ public class OpusPackets {
             case 3:
                 return new CodeThreePacket();
             default:
-                throw new IllegalArgumentException("Invalid Opus Packet code: " + code);
+                throw new IllegalArgumentException("Invalid Opus packet code: " + code);
         }
     }
 
