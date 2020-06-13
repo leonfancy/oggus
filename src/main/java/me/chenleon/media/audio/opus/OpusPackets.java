@@ -171,18 +171,17 @@ public class OpusPackets {
                 opusPacket.setFrameCount(frameCount);
                 opusPacket.setVbr(isVbr);
                 opusPacket.setHasPadding(hasPadding);
-                int paddingLen = 0;
+                int paddingLenSum = 0;
                 if (hasPadding) {
                     while (true) {
-                        int n = in.read();
-                        if (n > 0) {
-                            paddingLen += n - 1;
-                        }
-                        if (n != 255) {
+                        int n = in.readUnsignedByte();
+                        paddingLenSum += n;
+                        if (n < 255) {
                             break;
                         }
                     }
                 }
+                opusPacket.setPaddingLength(paddingLenSum);
                 if (isVbr) {
                     int[] frameLens = new int[frameCount];
                     for (int k = 0; k < frameCount; k++) {
@@ -198,7 +197,7 @@ public class OpusPackets {
                     }
                 }
                 if (hasPadding) {
-                    in.skip(paddingLen);
+                    in.skip(paddingBytesLen(paddingLenSum));
                 }
                 break;
         }

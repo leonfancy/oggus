@@ -183,6 +183,31 @@ class OpusPacketsTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 254, 255, 256, 510, 513})
+    void should_parse_binary_contains_multiple_cbr_code_3_packet_with_padding(int paddingLength) {
+        OpusPacket expectedPacket = OpusPackets.newPacketOfCode(3);
+        expectedPacket.setConfig(Config.of(12));
+        expectedPacket.setMono(false);
+        expectedPacket.setVbr(false);
+        expectedPacket.setFrameCount(3);
+        expectedPacket.setHasPadding(true);
+        expectedPacket.setPaddingLength(paddingLength);
+
+        for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
+            expectedPacket.addFrame(TestUtil.createBinary(10, (byte) i));
+        }
+
+        byte[] data = Bytes.concat(expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToStandardFormat());
+        List<OpusPacket> opusPackets = OpusPackets.from(data, 3);
+
+        for (OpusPacket opusPacket : opusPackets) {
+            assertOpusPacketEqual(expectedPacket, opusPacket);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 254, 255, 256, 510, 513})
     void should_parse_binary_contains_only_one_vbr_code_3_packet_with_padding(int paddingLength) {
         OpusPacket expectedPacket = OpusPackets.newPacketOfCode(3);
         expectedPacket.setConfig(Config.of(12));
@@ -200,6 +225,31 @@ class OpusPacketsTest {
         OpusPacket parsedPacket = OpusPackets.from(data);
 
         assertOpusPacketEqual(expectedPacket, parsedPacket);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 254, 255, 256, 510, 513})
+    void should_parse_binary_contains_multiple_vbr_code_3_packet_with_padding(int paddingLength) {
+        OpusPacket expectedPacket = OpusPackets.newPacketOfCode(3);
+        expectedPacket.setConfig(Config.of(12));
+        expectedPacket.setMono(false);
+        expectedPacket.setVbr(true);
+        expectedPacket.setFrameCount(3);
+        expectedPacket.setHasPadding(true);
+        expectedPacket.setPaddingLength(paddingLength);
+
+        for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
+            expectedPacket.addFrame(TestUtil.createBinary(10 + i, (byte) i));
+        }
+
+        byte[] data = Bytes.concat(expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToStandardFormat());
+        List<OpusPacket> opusPackets = OpusPackets.from(data, 3);
+
+        for (OpusPacket opusPacket : opusPackets) {
+            assertOpusPacketEqual(expectedPacket, opusPacket);
+        }
     }
 
     private void assertOpusPacketEqual(OpusPacket expected, OpusPacket actual) {
