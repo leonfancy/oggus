@@ -4,11 +4,11 @@ import static me.chenleon.media.audio.opus.Bandwidth.*;
 import static me.chenleon.media.audio.opus.EncodeMode.*;
 
 public class Config {
-    private int id;
+    private final int id;
     private final EncodeMode encodeMode;
     private final Bandwidth bandwidth;
     private final double frameSize;
-    private static Config[] configs = {
+    private static final Config[] configs = {
             new Config(0, SILK, NB, 10),
             new Config(1, SILK, NB, 20),
             new Config(2, SILK, NB, 40),

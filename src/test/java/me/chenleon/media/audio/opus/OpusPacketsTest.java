@@ -1,8 +1,12 @@
 package me.chenleon.media.audio.opus;
 
+import com.google.common.primitives.Bytes;
+import me.chenleon.media.TestUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,5 +38,55 @@ class OpusPacketsTest {
         assertEquals(Config.of(1), opusPacket.getConfig());
         assertFalse(opusPacket.isMono());
         assertEquals(2, opusPacket.getCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2})
+    void should_parse_binary_contains_only_one_packet(int code) {
+        OpusPacket expectedPacket = OpusPackets.newPacketOfCode(code);
+        expectedPacket.setConfig(Config.of(1));
+        expectedPacket.setMono(false);
+        for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
+            expectedPacket.addFrame(TestUtil.createBinary(10, (byte) i));
+        }
+
+        byte[] data = expectedPacket.dumpToStandardFormat();
+        OpusPacket parsedPacket = OpusPackets.from(data);
+
+        assertOpusPacketEqual(parsedPacket, expectedPacket);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2})
+    void should_parse_binary_contains_multiple_packets(int code) {
+        OpusPacket expectedPacket = OpusPackets.newPacketOfCode(code);
+        expectedPacket.setConfig(Config.of(1));
+        expectedPacket.setMono(false);
+        for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
+            expectedPacket.addFrame(TestUtil.createBinary(10, (byte) i));
+        }
+
+        byte[] data = Bytes.concat(expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToStandardFormat());
+        List<OpusPacket> opusPackets = OpusPackets.from(data, 3);
+
+        for (OpusPacket opusPacket : opusPackets) {
+            assertOpusPacketEqual(opusPacket, expectedPacket);
+        }
+    }
+
+    private void assertOpusPacketEqual(OpusPacket expected, OpusPacket actual) {
+        assertEquals(expected.getCode(), actual.getCode());
+        assertEquals(expected.getConfig().getId(), actual.getConfig().getId());
+        assertEquals(expected.isMono(), actual.isMono());
+        assertEquals(expected.isVbr(), actual.isVbr());
+        assertEquals(expected.hasPadding(), actual.hasPadding());
+        assertEquals(expected.getPaddingLength(), actual.getPaddingLength());
+        assertEquals(expected.getFrameCount(), actual.getFrameCount());
+        assertEquals(expected.getFrames().size(), actual.getFrames().size());
+        for (int i = 0; i < expected.getFrames().size(); i++) {
+            assertArrayEquals(expected.getFrames().get(i), actual.getFrames().get(i));
+        }
     }
 }
