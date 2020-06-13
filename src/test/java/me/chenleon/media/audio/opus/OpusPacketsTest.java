@@ -53,7 +53,7 @@ class OpusPacketsTest {
         byte[] data = expectedPacket.dumpToStandardFormat();
         OpusPacket parsedPacket = OpusPackets.from(data);
 
-        assertOpusPacketEqual(parsedPacket, expectedPacket);
+        assertOpusPacketEqual(expectedPacket, parsedPacket);
     }
 
     @ParameterizedTest
@@ -72,7 +72,7 @@ class OpusPacketsTest {
         List<OpusPacket> opusPackets = OpusPackets.from(data, 3);
 
         for (OpusPacket opusPacket : opusPackets) {
-            assertOpusPacketEqual(opusPacket, expectedPacket);
+            assertOpusPacketEqual(expectedPacket, opusPacket);
         }
     }
 
@@ -92,7 +92,7 @@ class OpusPacketsTest {
         byte[] data = expectedPacket.dumpToStandardFormat();
         OpusPacket parsedPacket = OpusPackets.from(data);
 
-        assertOpusPacketEqual(parsedPacket, expectedPacket);
+        assertOpusPacketEqual(expectedPacket, parsedPacket);
     }
 
     @Test
@@ -111,7 +111,28 @@ class OpusPacketsTest {
         byte[] data = expectedPacket.dumpToStandardFormat();
         OpusPacket parsedPacket = OpusPackets.from(data);
 
-        assertOpusPacketEqual(parsedPacket, expectedPacket);
+        assertOpusPacketEqual(expectedPacket, parsedPacket);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 254, 255, 256, 510, 513})
+    void should_parse_binary_contains_only_one_cbr_code_3_packet_with_padding(int paddingLength) {
+        OpusPacket expectedPacket = OpusPackets.newPacketOfCode(3);
+        expectedPacket.setConfig(Config.of(12));
+        expectedPacket.setMono(false);
+        expectedPacket.setVbr(false);
+        expectedPacket.setFrameCount(3);
+        expectedPacket.setHasPadding(true);
+        expectedPacket.setPaddingLength(paddingLength);
+
+        for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
+            expectedPacket.addFrame(TestUtil.createBinary(10, (byte) i));
+        }
+
+        byte[] data = expectedPacket.dumpToStandardFormat();
+        OpusPacket parsedPacket = OpusPackets.from(data);
+
+        assertOpusPacketEqual(expectedPacket, parsedPacket);
     }
 
     private void assertOpusPacketEqual(OpusPacket expected, OpusPacket actual) {

@@ -103,18 +103,17 @@ public class OpusPackets {
                 opusPacket.setFrameCount(frameCount);
                 opusPacket.setVbr(isVbr);
                 opusPacket.setHasPadding(hasPadding);
-                int paddingLen = 0;
+                int paddingLenSum = 0;
                 if (hasPadding) {
                     while (true) {
-                        int n = in.read();
-                        if (n > 0) {
-                            paddingLen += n - 1;
-                        }
-                        if (n != 255) {
+                        int n = in.readUnsignedByte();
+                        paddingLenSum += n;
+                        if (n < 255) {
                             break;
                         }
                     }
                 }
+                opusPacket.setPaddingLength(paddingLenSum);
                 if (isVbr) {
                     int[] frameLens = new int[frameCount - 1];
                     for (int k = 0; k < frameCount - 1; k++) {
@@ -123,21 +122,25 @@ public class OpusPackets {
                     for (int k = 0; k < frameCount - 1; k++) {
                         opusPacket.addFrame(in.readNBytes(frameLens[k]));
                     }
-                    int lastFrameLen = in.available() - paddingLen;
+                    int lastFrameLen = in.available() - paddingLenSum;
                     opusPacket.addFrame(in.readNBytes(lastFrameLen));
                 } else {
-                    int frameLen = (in.available() - paddingLen) / frameCount;
+                    int frameLen = (in.available() - paddingBytesLen(paddingLenSum)) / frameCount;
                     for (int k = 0; k < frameCount; k++) {
                         opusPacket.addFrame(in.readNBytes(frameLen));
                     }
                 }
                 if (hasPadding) {
                     // discard padding bytes
-                    in.skip(paddingLen);
+                    in.skip(paddingBytesLen(paddingLenSum));
                 }
                 break;
         }
         return opusPacket;
+    }
+
+    private static int paddingBytesLen(int paddingLenSum) {
+        return (paddingLenSum / 255) * 254 + paddingLenSum % 255;
     }
 
     private static OpusPacket readDelimitedOpusPacket(InputStream inputStream) throws IOException {
