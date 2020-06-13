@@ -95,6 +95,25 @@ class OpusPacketsTest {
         assertOpusPacketEqual(parsedPacket, expectedPacket);
     }
 
+    @Test
+    void should_parse_binary_contains_only_one_vbr_code_3_packet_without_padding() {
+        OpusPacket expectedPacket = OpusPackets.newPacketOfCode(3);
+        expectedPacket.setConfig(Config.of(12));
+        expectedPacket.setMono(false);
+        expectedPacket.setVbr(true);
+        expectedPacket.setFrameCount(3);
+        expectedPacket.setHasPadding(false);
+
+        for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
+            expectedPacket.addFrame(TestUtil.createBinary(10 + i, (byte) i));
+        }
+
+        byte[] data = expectedPacket.dumpToStandardFormat();
+        OpusPacket parsedPacket = OpusPackets.from(data);
+
+        assertOpusPacketEqual(parsedPacket, expectedPacket);
+    }
+
     private void assertOpusPacketEqual(OpusPacket expected, OpusPacket actual) {
         assertEquals(expected.getCode(), actual.getCode());
         assertEquals(expected.getConfig().getId(), actual.getConfig().getId());

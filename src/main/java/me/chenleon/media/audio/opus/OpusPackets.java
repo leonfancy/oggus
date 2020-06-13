@@ -101,6 +101,8 @@ public class OpusPackets {
                 boolean hasPadding = (frameCountByte & 0x40) != 0;
                 int frameCount = frameCountByte & 0x3F;
                 opusPacket.setFrameCount(frameCount);
+                opusPacket.setVbr(isVbr);
+                opusPacket.setHasPadding(hasPadding);
                 int paddingLen = 0;
                 if (hasPadding) {
                     while (true) {
