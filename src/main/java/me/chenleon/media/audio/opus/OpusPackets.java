@@ -122,7 +122,7 @@ public class OpusPackets {
                     for (int k = 0; k < frameCount - 1; k++) {
                         opusPacket.addFrame(in.readNBytes(frameLens[k]));
                     }
-                    int lastFrameLen = in.available() - paddingLenSum;
+                    int lastFrameLen = in.available() - paddingBytesLen(paddingLenSum);
                     opusPacket.addFrame(in.readNBytes(lastFrameLen));
                 } else {
                     int frameLen = (in.available() - paddingBytesLen(paddingLenSum)) / frameCount;
