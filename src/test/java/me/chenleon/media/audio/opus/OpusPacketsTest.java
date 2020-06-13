@@ -96,6 +96,29 @@ class OpusPacketsTest {
     }
 
     @Test
+    void should_parse_binary_contains_multiple_cbr_code_3_packet_without_padding() {
+        OpusPacket expectedPacket = OpusPackets.newPacketOfCode(3);
+        expectedPacket.setConfig(Config.of(12));
+        expectedPacket.setMono(false);
+        expectedPacket.setVbr(false);
+        expectedPacket.setFrameCount(3);
+        expectedPacket.setHasPadding(false);
+
+        for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
+            expectedPacket.addFrame(TestUtil.createBinary(10, (byte) i));
+        }
+
+        byte[] data = Bytes.concat(expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToStandardFormat());
+        List<OpusPacket> opusPackets = OpusPackets.from(data, 3);
+
+        for (OpusPacket opusPacket : opusPackets) {
+            assertOpusPacketEqual(expectedPacket, opusPacket);
+        }
+    }
+
+    @Test
     void should_parse_binary_contains_only_one_vbr_code_3_packet_without_padding() {
         OpusPacket expectedPacket = OpusPackets.newPacketOfCode(3);
         expectedPacket.setConfig(Config.of(12));
@@ -112,6 +135,29 @@ class OpusPacketsTest {
         OpusPacket parsedPacket = OpusPackets.from(data);
 
         assertOpusPacketEqual(expectedPacket, parsedPacket);
+    }
+
+    @Test
+    void should_parse_binary_contains_multiple_vbr_code_3_packet_without_padding() {
+        OpusPacket expectedPacket = OpusPackets.newPacketOfCode(3);
+        expectedPacket.setConfig(Config.of(12));
+        expectedPacket.setMono(false);
+        expectedPacket.setVbr(true);
+        expectedPacket.setFrameCount(3);
+        expectedPacket.setHasPadding(false);
+
+        for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
+            expectedPacket.addFrame(TestUtil.createBinary(10 + i, (byte) i));
+        }
+
+        byte[] data = Bytes.concat(expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToSelfDelimitingFormat(),
+                expectedPacket.dumpToStandardFormat());
+        List<OpusPacket> opusPackets = OpusPackets.from(data, 3);
+
+        for (OpusPacket opusPacket : opusPackets) {
+            assertOpusPacketEqual(expectedPacket, opusPacket);
+        }
     }
 
     @ParameterizedTest
