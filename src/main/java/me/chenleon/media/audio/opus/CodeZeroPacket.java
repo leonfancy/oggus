@@ -27,7 +27,7 @@ class CodeZeroPacket extends OpusPacket {
     }
 
     @Override
-    public int getPaddingLength() {
+    public int getPadLenBytesSum() {
         return 0;
     }
 

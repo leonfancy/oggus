@@ -1,13 +1,12 @@
 package me.chenleon.media.audio.opus;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 
 class CodeThreePacket extends OpusPacket {
     private boolean isVbr;
     private boolean hasPadding;
     private int frameCount;
-    private int paddingLength;
+    private int padLenBytesSum;
 
     public void setVbr(boolean isVbr) {
         this.isVbr = isVbr;
@@ -21,8 +20,8 @@ class CodeThreePacket extends OpusPacket {
         this.frameCount = frameCount;
     }
 
-    public void setPaddingLength(int paddingLength) {
-        this.paddingLength = paddingLength;
+    public void setPadLenBytesSum(int padLenBytesSum) {
+        this.padLenBytesSum = padLenBytesSum;
     }
 
     @Override
@@ -46,8 +45,8 @@ class CodeThreePacket extends OpusPacket {
     }
 
     @Override
-    public int getPaddingLength() {
-        return paddingLength;
+    public int getPadLenBytesSum() {
+        return padLenBytesSum;
     }
 
     @Override
@@ -65,15 +64,13 @@ class CodeThreePacket extends OpusPacket {
 
         out.write(getTocByte());
         out.write(getFrameCountByte());
-        byte[] padding = new byte[0];
         if (hasPadding) {
-            int byteCountOf255 = paddingLength / 255;
-            int lastByteValue = paddingLength - byteCountOf255 * 255;
-            byte[] paddingLengthBytes = new byte[byteCountOf255 + 1];
-            Arrays.fill(paddingLengthBytes, 0, byteCountOf255, (byte) 255);
-            paddingLengthBytes[paddingLengthBytes.length - 1] = (byte) lastByteValue;
-            out.writeBytes(paddingLengthBytes);
-            padding = new byte[paddingLength - byteCountOf255];
+            int byteCountOf255 = padLenBytesSum / 255;
+            int lastByteValue = padLenBytesSum - byteCountOf255 * 255;
+            for (int i = 0; i < byteCountOf255; i++) {
+                out.write(255);
+            }
+            out.write(lastByteValue);
         }
         if (isVbr) {
             int count = isStandard ? frames.size() - 1 : frames.size();
@@ -89,7 +86,7 @@ class CodeThreePacket extends OpusPacket {
             out.writeBytes(frame);
         }
         if (hasPadding) {
-            out.writeBytes(padding);
+            out.writeBytes(new byte[getPadDataLen()]);
         }
 
         return out.toByteArray();

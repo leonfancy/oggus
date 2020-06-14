@@ -1,10 +1,7 @@
 package me.chenleon.media.audio.opus;
 
-import com.google.common.io.LittleEndianDataInputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +52,7 @@ public class OpusPackets {
      */
     public static List<OpusPacket> from(byte[] data, int streamCount) {
         ArrayList<OpusPacket> opusPackets = new ArrayList<>();
-        LittleEndianDataInputStream in = new LittleEndianDataInputStream(new ByteArrayInputStream(data));
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
         try {
             for (int i = 0; i < streamCount - 1; i++) {
                 opusPackets.add(OpusPackets.readDelimitedOpusPacket(in));
@@ -77,9 +74,8 @@ public class OpusPackets {
         return from(data, 1).get(0);
     }
 
-    private static OpusPacket readStandardOpusPacket(InputStream inputStream) throws IOException {
-        LittleEndianDataInputStream in = new LittleEndianDataInputStream(inputStream);
-        int toc = in.readByte();
+    private static OpusPacket readStandardOpusPacket(ByteArrayInputStream in) throws IOException {
+        int toc = in.read();
         OpusPacket opusPacket = newPacketOfToc((byte) toc);
         switch (opusPacket.getCode()) {
             case 0:
@@ -96,56 +92,33 @@ public class OpusPackets {
                 opusPacket.addFrame(in.readAllBytes());
                 break;
             case 3:
-                int frameCountByte = in.read();
-                boolean isVbr = (frameCountByte & 0x80) != 0;
-                boolean hasPadding = (frameCountByte & 0x40) != 0;
-                int frameCount = frameCountByte & 0x3F;
-                opusPacket.setFrameCount(frameCount);
-                opusPacket.setVbr(isVbr);
-                opusPacket.setHasPadding(hasPadding);
-                int paddingLenSum = 0;
-                if (hasPadding) {
-                    while (true) {
-                        int n = in.readUnsignedByte();
-                        paddingLenSum += n;
-                        if (n < 255) {
-                            break;
-                        }
-                    }
-                }
-                opusPacket.setPaddingLength(paddingLenSum);
-                if (isVbr) {
-                    int[] frameLens = new int[frameCount - 1];
-                    for (int k = 0; k < frameCount - 1; k++) {
+                readCode3PacketHeader(in, opusPacket);
+                if (opusPacket.isVbr()) {
+                    int[] frameLens = new int[opusPacket.getFrameCount() - 1];
+                    for (int k = 0; k < opusPacket.getFrameCount() - 1; k++) {
                         frameLens[k] = readFrameLen(in);
                     }
-                    for (int k = 0; k < frameCount - 1; k++) {
+                    for (int k = 0; k < opusPacket.getFrameCount() - 1; k++) {
                         opusPacket.addFrame(in.readNBytes(frameLens[k]));
                     }
-                    int lastFrameLen = in.available() - paddingBytesLen(paddingLenSum);
+                    int lastFrameLen = in.available() - opusPacket.getPadDataLen();
                     opusPacket.addFrame(in.readNBytes(lastFrameLen));
                 } else {
-                    int frameLen = (in.available() - paddingBytesLen(paddingLenSum)) / frameCount;
-                    for (int k = 0; k < frameCount; k++) {
+                    int frameLen = (in.available() - opusPacket.getPadDataLen()) / opusPacket.getFrameCount();
+                    for (int k = 0; k < opusPacket.getFrameCount(); k++) {
                         opusPacket.addFrame(in.readNBytes(frameLen));
                     }
                 }
-                if (hasPadding) {
-                    // discard padding bytes
-                    in.skip(paddingBytesLen(paddingLenSum));
+                if (opusPacket.hasPadding()) {
+                    in.skip(opusPacket.getPadDataLen());
                 }
                 break;
         }
         return opusPacket;
     }
 
-    private static int paddingBytesLen(int paddingLenSum) {
-        return (paddingLenSum / 255) * 254 + paddingLenSum % 255;
-    }
-
-    private static OpusPacket readDelimitedOpusPacket(InputStream inputStream) throws IOException {
-        LittleEndianDataInputStream in = new LittleEndianDataInputStream(inputStream);
-        int toc = in.readByte();
+    private static OpusPacket readDelimitedOpusPacket(ByteArrayInputStream in) throws IOException {
+        int toc = in.read();
         OpusPacket opusPacket = newPacketOfToc((byte) toc);
         switch (opusPacket.getCode()) {
             case 0:
@@ -164,47 +137,51 @@ public class OpusPackets {
                 opusPacket.addFrame(in.readNBytes(frameLen2));
                 break;
             case 3:
-                int frameCountByte = in.read();
-                boolean isVbr = (frameCountByte & 0x80) != 0;
-                boolean hasPadding = (frameCountByte & 0x40) != 0;
-                int frameCount = frameCountByte & 0x3F;
-                opusPacket.setFrameCount(frameCount);
-                opusPacket.setVbr(isVbr);
-                opusPacket.setHasPadding(hasPadding);
-                int paddingLenSum = 0;
-                if (hasPadding) {
-                    while (true) {
-                        int n = in.readUnsignedByte();
-                        paddingLenSum += n;
-                        if (n < 255) {
-                            break;
-                        }
-                    }
-                }
-                opusPacket.setPaddingLength(paddingLenSum);
-                if (isVbr) {
-                    int[] frameLens = new int[frameCount];
-                    for (int k = 0; k < frameCount; k++) {
+                readCode3PacketHeader(in, opusPacket);
+                if (opusPacket.isVbr()) {
+                    int[] frameLens = new int[opusPacket.getFrameCount()];
+                    for (int k = 0; k < opusPacket.getFrameCount(); k++) {
                         frameLens[k] = readFrameLen(in);
                     }
-                    for (int k = 0; k < frameCount; k++) {
+                    for (int k = 0; k < opusPacket.getFrameCount(); k++) {
                         opusPacket.addFrame(in.readNBytes(frameLens[k]));
                     }
                 } else {
                     frameLen = readFrameLen(in);
-                    for (int k = 0; k < frameCount; k++) {
+                    for (int k = 0; k < opusPacket.getFrameCount(); k++) {
                         opusPacket.addFrame(in.readNBytes(frameLen));
                     }
                 }
-                if (hasPadding) {
-                    in.skip(paddingBytesLen(paddingLenSum));
+                if (opusPacket.hasPadding()) {
+                    in.skip(opusPacket.getPadDataLen());
                 }
                 break;
         }
         return opusPacket;
     }
 
-    private static int readFrameLen(InputStream in) throws IOException {
+    private static void readCode3PacketHeader(ByteArrayInputStream in, OpusPacket opusPacket) {
+        int frameCountByte = in.read();
+        boolean isVbr = (frameCountByte & 0x80) != 0;
+        boolean hasPadding = (frameCountByte & 0x40) != 0;
+        int frameCount = frameCountByte & 0x3F;
+        int paddingLenSum = 0;
+        if (hasPadding) {
+            while (true) {
+                int n = in.read();
+                paddingLenSum += n;
+                if (n < 255) {
+                    break;
+                }
+            }
+        }
+        opusPacket.setFrameCount(frameCount);
+        opusPacket.setVbr(isVbr);
+        opusPacket.setHasPadding(hasPadding);
+        opusPacket.setPadLenBytesSum(paddingLenSum);
+    }
+
+    private static int readFrameLen(ByteArrayInputStream in) {
         int frameLen = in.read();
         if (frameLen > 252) {
             frameLen = in.read() * 4 + frameLen;

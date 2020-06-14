@@ -15,13 +15,13 @@ class CodeThreePacketTest {
         opusPacket.setVbr(true);
         opusPacket.setFrameCount(10);
         opusPacket.setHasPadding(true);
-        opusPacket.setPaddingLength(12);
+        opusPacket.setPadLenBytesSum(12);
 
         assertEquals(3, opusPacket.getCode());
         assertTrue(opusPacket.isVbr());
         assertTrue(opusPacket.hasPadding());
         assertEquals(10, opusPacket.getFrameCount());
-        assertEquals(12, opusPacket.getPaddingLength());
+        assertEquals(12, opusPacket.getPadLenBytesSum());
     }
 
     @Test
@@ -84,7 +84,7 @@ class CodeThreePacketTest {
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(1);
         opusPacket.setHasPadding(true);
-        opusPacket.setPaddingLength(length);
+        opusPacket.setPadLenBytesSum(length);
 
         byte[] frameData1 = TestUtil.createBinary(513, (byte) 1);
 
@@ -107,7 +107,7 @@ class CodeThreePacketTest {
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(1);
         opusPacket.setHasPadding(true);
-        opusPacket.setPaddingLength(255);
+        opusPacket.setPadLenBytesSum(255);
 
         byte[] frameData1 = TestUtil.createBinary(513, (byte) 1);
 
@@ -130,7 +130,7 @@ class CodeThreePacketTest {
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(1);
         opusPacket.setHasPadding(true);
-        opusPacket.setPaddingLength(256);
+        opusPacket.setPadLenBytesSum(256);
 
         byte[] frameData1 = TestUtil.createBinary(513, (byte) 1);
 
@@ -153,7 +153,7 @@ class CodeThreePacketTest {
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(1);
         opusPacket.setHasPadding(true);
-        opusPacket.setPaddingLength(511);
+        opusPacket.setPadLenBytesSum(511);
 
         byte[] frameData1 = TestUtil.createBinary(513, (byte) 1);
 

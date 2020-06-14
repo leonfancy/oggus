@@ -70,7 +70,11 @@ public abstract class OpusPacket {
 
     public abstract int getFrameCount();
 
-    public abstract int getPaddingLength();
+    public abstract int getPadLenBytesSum();
+
+    public int getPadDataLen() {
+        return (getPadLenBytesSum() / 255) * 254 + getPadLenBytesSum() % 255;
+    }
 
     public void setVbr(boolean isVbr) {
         throw new IllegalStateException("Code 0 to 2 Opus packet doesn't support setting Vbr flag");
@@ -84,7 +88,7 @@ public abstract class OpusPacket {
         throw new IllegalStateException("Code 0 to 2 packet doesn't support setting frame count");
     }
 
-    public void setPaddingLength(int paddingLength) {
+    public void setPadLenBytesSum(int padLenBytesSum) {
         throw new IllegalStateException("Code 0 to 2 packet doesn't support setting padding length");
     }
 

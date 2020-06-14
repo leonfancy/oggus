@@ -2,6 +2,7 @@ package me.chenleon.media.audio.opus;
 
 import com.google.common.primitives.Ints;
 import me.chenleon.media.container.ogg.OggStream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 
 class OpusFileTest {
     @Test
+    @Disabled
     void shouldReadOggStream() throws IOException {
         OpusFile opusFile = new OpusFile(new OggStream("audio/hellopeter.opus"));
         IdHeader idHeader = opusFile.getIdHeader();

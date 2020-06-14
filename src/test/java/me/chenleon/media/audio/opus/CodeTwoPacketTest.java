@@ -14,7 +14,7 @@ class CodeTwoPacketTest {
         assertTrue(opusPacket.isVbr());
         assertFalse(opusPacket.hasPadding());
         assertEquals(2, opusPacket.getFrameCount());
-        assertEquals(0, opusPacket.getPaddingLength());
+        assertEquals(0, opusPacket.getPadLenBytesSum());
     }
 
     @Test

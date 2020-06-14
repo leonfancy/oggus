@@ -59,4 +59,12 @@ class OpusPacketTest {
         });
         assertEquals("Frame size must be the same in CBR Opus packet", exception.getMessage());
     }
+
+    @ParameterizedTest
+    @CsvSource({"1,1", "255,254", "256,255", "510,508", "513,511"})
+    void should_get_correct_padding_data_length_from_padding_length_bytes_sum(int padLenBytesSum, int padDataLen) {
+        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
+        opusPacket.setPadLenBytesSum(padLenBytesSum);
+        assertEquals(padDataLen, opusPacket.getPadDataLen());
+    }
 }

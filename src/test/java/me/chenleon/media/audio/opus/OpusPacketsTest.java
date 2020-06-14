@@ -63,7 +63,7 @@ class OpusPacketsTest {
         expectedPacket.setConfig(Config.of(1));
         expectedPacket.setMono(false);
         for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
-            expectedPacket.addFrame(TestUtil.createBinary(10, (byte) i));
+            expectedPacket.addFrame(TestUtil.createBinary(255, (byte) i));
         }
 
         byte[] data = Bytes.concat(expectedPacket.dumpToSelfDelimitingFormat(),
@@ -169,7 +169,7 @@ class OpusPacketsTest {
         expectedPacket.setVbr(false);
         expectedPacket.setFrameCount(3);
         expectedPacket.setHasPadding(true);
-        expectedPacket.setPaddingLength(paddingLength);
+        expectedPacket.setPadLenBytesSum(paddingLength);
 
         for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
             expectedPacket.addFrame(TestUtil.createBinary(10, (byte) i));
@@ -190,7 +190,7 @@ class OpusPacketsTest {
         expectedPacket.setVbr(false);
         expectedPacket.setFrameCount(3);
         expectedPacket.setHasPadding(true);
-        expectedPacket.setPaddingLength(paddingLength);
+        expectedPacket.setPadLenBytesSum(paddingLength);
 
         for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
             expectedPacket.addFrame(TestUtil.createBinary(10, (byte) i));
@@ -215,7 +215,7 @@ class OpusPacketsTest {
         expectedPacket.setVbr(true);
         expectedPacket.setFrameCount(3);
         expectedPacket.setHasPadding(true);
-        expectedPacket.setPaddingLength(paddingLength);
+        expectedPacket.setPadLenBytesSum(paddingLength);
 
         for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
             expectedPacket.addFrame(TestUtil.createBinary(10 + i, (byte) i));
@@ -236,7 +236,7 @@ class OpusPacketsTest {
         expectedPacket.setVbr(true);
         expectedPacket.setFrameCount(3);
         expectedPacket.setHasPadding(true);
-        expectedPacket.setPaddingLength(paddingLength);
+        expectedPacket.setPadLenBytesSum(paddingLength);
 
         for (int i = 0; i < expectedPacket.getFrameCount(); i++) {
             expectedPacket.addFrame(TestUtil.createBinary(10 + i, (byte) i));
@@ -258,7 +258,7 @@ class OpusPacketsTest {
         assertEquals(expected.isMono(), actual.isMono());
         assertEquals(expected.isVbr(), actual.isVbr());
         assertEquals(expected.hasPadding(), actual.hasPadding());
-        assertEquals(expected.getPaddingLength(), actual.getPaddingLength());
+        assertEquals(expected.getPadLenBytesSum(), actual.getPadLenBytesSum());
         assertEquals(expected.getFrameCount(), actual.getFrameCount());
         assertEquals(expected.getFrames().size(), actual.getFrames().size());
         for (int i = 0; i < expected.getFrames().size(); i++) {
