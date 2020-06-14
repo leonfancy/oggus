@@ -1,8 +1,6 @@
 package me.chenleon.media.audio.opus;
 
-import java.io.ByteArrayOutputStream;
-
-class CodeOnePacket extends OpusPacket {
+class CodeOnePacket extends FixedFrameCountPacket {
     @Override
     public int getCode() {
         return 1;
@@ -26,34 +24,5 @@ class CodeOnePacket extends OpusPacket {
     @Override
     public int getPadLenBytesSum() {
         return 0;
-    }
-
-    @Override
-    public byte[] dumpToStandardFormat() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        out.write(getTocByte());
-        for (byte[] frame : frames) {
-            out.writeBytes(frame);
-        }
-
-        return out.toByteArray();
-    }
-
-    @Override
-    public byte[] dumpToSelfDelimitingFormat() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        out.write(getTocByte());
-        if (frames.size() == 0) {
-            out.write(0);
-        } else {
-            out.writeBytes(OpusUtil.frameLengthToBytes(frames.get(0).length));
-        }
-        for (byte[] frame : frames) {
-            out.writeBytes(frame);
-        }
-
-        return out.toByteArray();
     }
 }
