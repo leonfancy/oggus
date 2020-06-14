@@ -1,13 +1,7 @@
 package me.chenleon.media.audio.opus;
 
-import me.chenleon.media.container.ogg.DumpException;
-
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
-/**
- * An Opus packet that described in RFC6716
- */
 class CodeOnePacket extends OpusPacket {
     @Override
     public int getCode() {
@@ -38,13 +32,9 @@ class CodeOnePacket extends OpusPacket {
     public byte[] dumpToStandardFormat() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        try {
-            out.write(getTocByte());
-            for (byte[] frame : frames) {
-                out.write(frame);
-            }
-        } catch (IOException e) {
-            throw new DumpException("OpusPacket dump to byte array error", e);
+        out.write(getTocByte());
+        for (byte[] frame : frames) {
+            out.writeBytes(frame);
         }
 
         return out.toByteArray();
@@ -54,17 +44,16 @@ class CodeOnePacket extends OpusPacket {
     public byte[] dumpToSelfDelimitingFormat() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        try {
-            out.write(getTocByte());
-            out.write(OpusUtil.frameLengthToBytes(frames.get(0).length));
-            for (byte[] frame : frames) {
-                out.write(frame);
-            }
-        } catch (IOException e) {
-            throw new DumpException("OpusPacket dump to byte array error", e);
+        out.write(getTocByte());
+        if (frames.size() == 0) {
+            out.write(0);
+        } else {
+            out.writeBytes(OpusUtil.frameLengthToBytes(frames.get(0).length));
+        }
+        for (byte[] frame : frames) {
+            out.writeBytes(frame);
         }
 
         return out.toByteArray();
     }
-
 }

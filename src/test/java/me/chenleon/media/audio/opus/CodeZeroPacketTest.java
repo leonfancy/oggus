@@ -29,4 +29,13 @@ class CodeZeroPacketTest {
         byte[] selfDelimitingBytes = opusPacket.dumpToSelfDelimitingFormat();
         assertArrayEquals(Bytes.concat(new byte[]{100, (byte) 253, 65}, frameData), selfDelimitingBytes);
     }
+
+    @Test
+    void should_dump_to_binary_given_a_zero_frame_packet() {
+        OpusPacket opusPacket = OpusPackets.newPacketOfCode(0);
+        opusPacket.setConfig(Config.of(12));
+        opusPacket.setMono(false);
+        assertArrayEquals(new byte[]{100}, opusPacket.dumpToStandardFormat());
+        assertArrayEquals(new byte[]{100, 0}, opusPacket.dumpToSelfDelimitingFormat());
+    }
 }
