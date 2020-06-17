@@ -18,7 +18,6 @@ public class OggPage {
     private int checkSum;
     private int segCount;
     private byte[] laceValues;
-    private final LinkedList<OggPacket> oggPackets = new LinkedList<>();
     private final List<byte[]> oggDataPackets = new LinkedList<>();
 
     public int getVersion() {
@@ -115,14 +114,6 @@ public class OggPage {
 
     public List<byte[]> getOggDataPackets() {
         return oggDataPackets;
-    }
-
-    public void addOggPacket(OggPacket oggPacket) {
-        this.oggPackets.add(oggPacket);
-    }
-
-    public LinkedList<OggPacket> getOggPackets() {
-        return oggPackets;
     }
 
     public byte[] dump() {

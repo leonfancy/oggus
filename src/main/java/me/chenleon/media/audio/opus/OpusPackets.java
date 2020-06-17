@@ -33,7 +33,7 @@ public class OpusPackets {
      *
      * @param toc the TOC byte
      */
-    public static OpusPacket newPacketOfToc(byte toc) {
+    public static OpusPacket newPacketOfToc(int toc) {
         int code = toc & 0x03;
         OpusPacket opusPacket = newPacketOfCode(code);
         opusPacket.config = Config.of(toc >> 3);
@@ -76,7 +76,7 @@ public class OpusPackets {
 
     private static OpusPacket readStandardOpusPacket(ByteArrayInputStream in) throws IOException {
         int toc = in.read();
-        OpusPacket opusPacket = newPacketOfToc((byte) toc);
+        OpusPacket opusPacket = newPacketOfToc(toc);
         switch (opusPacket.getCode()) {
             case 0:
                 opusPacket.addFrame(in.readAllBytes());
@@ -119,7 +119,7 @@ public class OpusPackets {
 
     private static OpusPacket readDelimitedOpusPacket(ByteArrayInputStream in) throws IOException {
         int toc = in.read();
-        OpusPacket opusPacket = newPacketOfToc((byte) toc);
+        OpusPacket opusPacket = newPacketOfToc(toc);
         switch (opusPacket.getCode()) {
             case 0:
                 int frameLen = readFrameLen(in);

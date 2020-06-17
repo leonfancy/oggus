@@ -29,15 +29,20 @@ class OpusPacketsTest {
 
     @Test
     void should_create_opus_packet_from_a_toc_byte() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfToc((byte) 0);
+        OpusPacket opusPacket = OpusPackets.newPacketOfToc(0);
         assertEquals(Config.of(0), opusPacket.getConfig());
         assertTrue(opusPacket.isMono());
         assertEquals(0, opusPacket.getCode());
 
-        opusPacket = OpusPackets.newPacketOfToc((byte) 14);
+        opusPacket = OpusPackets.newPacketOfToc(14);
         assertEquals(Config.of(1), opusPacket.getConfig());
         assertFalse(opusPacket.isMono());
         assertEquals(2, opusPacket.getCode());
+
+        opusPacket = OpusPackets.newPacketOfToc(184);
+        assertEquals(Config.of(23), opusPacket.getConfig());
+        assertTrue(opusPacket.isMono());
+        assertEquals(0, opusPacket.getCode());
     }
 
     @ParameterizedTest

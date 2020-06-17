@@ -50,7 +50,7 @@ public class OggStream {
      * @return the next Ogg page, or {@code null} if there isn't page left
      * @throws IOException if an I/O error occurs
      */
-    public OggPage readPage(int serialNum) throws IOException {
+    public OggPage readPage(long serialNum) throws IOException {
         while (hasNextPage()) {
             OggPage oggPage = nextPage();
             if (oggPage.getSerialNum() == serialNum) {
@@ -94,16 +94,12 @@ public class OggStream {
             packetLen += segLen;
             if (segLen < MAX_LACE_VALUE) {
                 byte[] data = in.readNBytes(packetLen);
-                OggPacket oggPacket = new OggPacket(data);
-                oggPage.addOggPacket(oggPacket);
                 oggPage.addOggDataPacket(data);
                 packetLen = 0;
             }
         }
         if (packetLen != 0) {
             byte[] data = in.readNBytes(packetLen);
-            OggPacket oggPacket = new OggPacket(data, true);
-            oggPage.addOggPacket(oggPacket);
             oggPage.addOggDataPacket(data);
         }
         return oggPage;

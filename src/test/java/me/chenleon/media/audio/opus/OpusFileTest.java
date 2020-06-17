@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 class OpusFileTest {
     @Test
-    @Disabled
     void shouldReadOggStream() throws IOException {
         OpusFile opusFile = new OpusFile(new OggStream("audio/hellopeter.opus"));
         IdHeader idHeader = opusFile.getIdHeader();
@@ -37,7 +36,7 @@ class OpusFileTest {
 
         int count = 1;
         while (true) {
-            AudioDataPacket audioDataPacket = opusFile.readAudioDataPacket();
+            AudioDataPacket audioDataPacket = opusFile.readAudioPacket();
             if (audioDataPacket == null) {
                 break;
             }

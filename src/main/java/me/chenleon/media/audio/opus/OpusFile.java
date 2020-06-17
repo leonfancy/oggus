@@ -1,23 +1,24 @@
 package me.chenleon.media.audio.opus;
 
 import com.google.common.primitives.Bytes;
-import me.chenleon.media.container.ogg.OggPacket;
 import me.chenleon.media.container.ogg.OggPage;
 import me.chenleon.media.container.ogg.OggStream;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-
-import static me.chenleon.media.audio.opus.OpusUtil.isIdHeaderPage;
 
 public class OpusFile {
     private final CommentHeader commentHeader;
     private final IdHeader idHeader;
     private final OggStream oggStream;
-    private final Queue<OggPacket> oggPacketBuffer = new LinkedList<>();
+    private final Queue<byte[]> lastPageLeftAudioDataPackets = new LinkedList<>();
+    private boolean isLastReadPageCompleted = true;
+    private long streamId;
+    private boolean isEnd = false;
 
     public OpusFile(OggStream oggStream) throws IOException {
         idHeader = readIdHeader(oggStream);
@@ -27,10 +28,7 @@ public class OpusFile {
 
     private IdHeader readIdHeader(OggStream oggStream) throws IOException {
         OggPage oggPage = readOpusBosPage(oggStream);
-        if (oggPage == null) {
-            throw new InvalidOpusException("No ID Header data in this opus file");
-        }
-
+        streamId = oggPage.getSerialNum();
         return IdHeader.from(oggPage.getOggDataPackets().get(0));
     }
 
@@ -38,31 +36,27 @@ public class OpusFile {
         while (true) {
             OggPage oggPage = oggStream.readPage();
             if (oggPage == null) {
-                return null;
+                throw new InvalidOpusException("No ID Header data in this opus file");
             }
 
-            if (!oggPage.isBOS() || !isIdHeaderPage(oggPage)) {
-                continue;
+            if (oggPage.isBOS()) {
+                if (oggPage.getOggDataPackets().size() > 1) {
+                    throw new InvalidOpusException("The ID Header Ogg page must NOT contain other data");
+                }
+                return oggPage;
             }
-
-            if (oggPage.getOggDataPackets().size() > 1) {
-                throw new InvalidOpusException("The ID Header Ogg page must NOT contain other data");
-            }
-            return oggPage;
         }
     }
 
     private CommentHeader readCommentHeader(OggStream oggStream) throws IOException {
-        OggPage currentPage;
-        LinkedList<OggPacket> currentPagePackets;
         byte[] commentHeaderData = new byte[0];
-        while (oggStream.hasNextPage()) {
-            currentPage = oggStream.nextPage();
-            currentPagePackets = currentPage.getOggPackets();
+        while (true) {
+            OggPage currentPage = oggStream.readPage(streamId);
+            List<byte[]> currentPagePackets = currentPage.getOggDataPackets();
             if (currentPagePackets.size() != 1) {
                 throw new InvalidOpusException("Comment Header ogg pages must only contain 1 data packet");
             }
-            commentHeaderData = Bytes.concat(commentHeaderData, currentPagePackets.pollFirst().getData());
+            commentHeaderData = Bytes.concat(commentHeaderData, currentPagePackets.get(0));
             if (currentPage.getGranulePosition() == 0) break;
         }
         return CommentHeader.from(commentHeaderData);
@@ -80,33 +74,52 @@ public class OpusFile {
         return commentHeader.getTags();
     }
 
-    public AudioDataPacket readAudioDataPacket() throws IOException {
-        OggPacket oggPacket = oggPacketBuffer.poll();
-        if (oggPacket != null && !oggPacket.isPartial()) {
-            return new AudioDataPacket(oggPacket.getData(), idHeader.getStreamCount());
-        }
-        while (oggStream.hasNextPage()) {
-            OggPage oggPage = oggStream.nextPage();
-            LinkedList<OggPacket> oggPackets = oggPage.getOggPackets();
-            if (oggPackets.size() < 1) {
-                throw new InvalidOpusException("At least one packet must be contained in a ogg page");
+    public AudioDataPacket readAudioPacket() throws IOException {
+        if (lastPageLeftAudioDataPackets.isEmpty()) {
+            if (isEnd) {
+                return null;
             }
 
-            if (oggPage.isContinued() && oggPacket != null) {
-                oggPacket = oggPacket.concat(oggPackets.poll());
-            } else if (!oggPage.isContinued() && oggPacket == null) {
-                oggPacket = oggPackets.pollFirst();
-            } else {
-                throw new InvalidOpusException("Invalid state of Opus file");
+            byte[] data = new byte[0];
+            while (true) {
+                OggPage oggPage = oggStream.readPage(streamId);
+                if (oggPage == null) {
+                    throw new InvalidOpusException("Corrupted opus binary data");
+                }
+                isEnd = oggPage.isEOS();
+                isLastReadPageCompleted = oggPage.isCompleted();
+                lastPageLeftAudioDataPackets.addAll(oggPage.getOggDataPackets());
+                data = Bytes.concat(data, lastPageLeftAudioDataPackets.poll());
+                if (isEnd || oggPage.getOggDataPackets().size() != 1 || oggPage.isCompleted()) {
+                    break;
+                }
             }
-            if (oggPage.getGranulePosition() != -1) {
-                oggPacketBuffer.addAll(oggPackets);
+            return new AudioDataPacket(data, idHeader.getStreamCount());
+        }
+
+        byte[] data = lastPageLeftAudioDataPackets.poll();
+
+        if (!lastPageLeftAudioDataPackets.isEmpty()) {
+            return new AudioDataPacket(data, idHeader.getStreamCount());
+        }
+
+        if (isLastReadPageCompleted) {
+            return new AudioDataPacket(data, idHeader.getStreamCount());
+        }
+
+        while (true) {
+            OggPage oggPage = oggStream.readPage(streamId);
+            if (oggPage == null) {
+                throw new InvalidOpusException("Corrupted opus binary data");
+            }
+            isEnd = oggPage.isEOS();
+            isLastReadPageCompleted = oggPage.isCompleted();
+            lastPageLeftAudioDataPackets.addAll(oggPage.getOggDataPackets());
+            data = Bytes.concat(data, lastPageLeftAudioDataPackets.poll());
+            if (isEnd || oggPage.getOggDataPackets().size() != 1 || oggPage.isCompleted()) {
                 break;
             }
         }
-        if (oggPacket == null) {
-            return null;
-        }
-        return new AudioDataPacket(oggPacket.getData(), idHeader.getStreamCount());
+        return new AudioDataPacket(data, idHeader.getStreamCount());
     }
 }
