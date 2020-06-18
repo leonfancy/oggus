@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OggPageTest {
     @Test
-    void shouldCorrectlyParseFlag() {
+    void should_correctly_parse_flag() {
         OggPage oggPage = new OggPage();
 
         oggPage.setFlag((byte) 0x00);
@@ -28,7 +28,7 @@ class OggPageTest {
     }
 
     @Test
-    void shouldCorrectlySetFlag() {
+    void should_correctly_set_flag() {
         OggPage oggPage = new OggPage();
         oggPage.setFlag((byte) 0x00);
 
@@ -53,7 +53,7 @@ class OggPageTest {
     }
 
     @Test
-    void shouldCorrectlyReturnIsCompletedStatus() {
+    void should_correctly_return_is_completed_status() {
         OggPage oggPage = new OggPage();
         oggPage.setSegCount(3);
         oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255});
@@ -68,7 +68,7 @@ class OggPageTest {
     }
 
     @Test
-    void shouldDumpOggPageToByteArray() {
+    void should_dump_ogg_page_to_byte_array() {
         OggPage oggPage = new OggPage();
         oggPage.setVersion(0);
         oggPage.setFlag((byte) 0x01);

@@ -1,6 +1,7 @@
 package me.chenleon.media.container.ogg;
 
 import com.google.common.primitives.Bytes;
+import me.chenleon.media.TestUtil;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OggStreamTest {
     @Test
-    void shouldReadOggPageFromInputStream() throws IOException {
+    void should_read_ogg_page_from_input_stream() throws IOException {
         OggPage expectedPage = createOggPage();
         expectedPage.setBOS();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(expectedPage.dump());
@@ -25,14 +26,14 @@ class OggStreamTest {
     }
 
     @Test
-    void shouldNotReadOggPageFromEmptyInputStream() throws IOException {
+    void should_not_read_ogg_page_from_empty_input_stream() throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[0]);
         OggStream oggStream = new OggStream(inputStream);
         assertNull(oggStream.readPage());
     }
 
     @Test
-    void shouldNotReadOggPageFromInputStreamWithOnlyInvalidData() throws IOException {
+    void should_not_read_ogg_page_from_input_stream_with_only_invalid_data() throws IOException {
         byte[] buf = new byte[10];
         Arrays.fill(buf, (byte) 'O');
         ByteArrayInputStream inputStream = new ByteArrayInputStream(buf);
@@ -41,7 +42,7 @@ class OggStreamTest {
     }
 
     @Test
-    void shouldSkipInvalidDataBeforeValidPage() throws IOException {
+    void should_skip_invalid_data_before_valid_page() throws IOException {
         OggPage expectedPage = createOggPage();
         byte[] invalidData = "OgOg".getBytes();
         byte[] data = Bytes.concat(invalidData, expectedPage.dump());
@@ -52,7 +53,7 @@ class OggStreamTest {
     }
 
     @Test
-    void shouldIgnoreInvalidDataBetweenPages() throws IOException {
+    void should_ignore_invalid_data_between_pages() throws IOException {
         OggPage expectedPage1 = createOggPage();
         expectedPage1.setBOS();
         OggPage expectedPage2 = createOggPage();
@@ -66,7 +67,7 @@ class OggStreamTest {
     }
 
     @Test
-    void shouldReadPageWithGivenSerialNum() throws IOException {
+    void should_read_page_with_given_serial_num() throws IOException {
         int serialNum = 100;
         OggPage expectedPage1 = createOggPage();
         OggPage expectedPage2 = createOggPage();
@@ -83,7 +84,7 @@ class OggStreamTest {
 
     @Test
     @Disabled
-    void shouldNotReadIfOggPageIsNotCompleted() throws IOException {
+    void should_not_read_if_ogg_page_is_not_completed() throws IOException {
         byte[] unCompletedPageData = {'O', 'g', 'g', 'S', 0, 1};
         ByteArrayInputStream inputStream = new ByteArrayInputStream(unCompletedPageData);
         OggStream oggStream = new OggStream(inputStream);
@@ -93,7 +94,7 @@ class OggStreamTest {
 
     @Test
     @Disabled
-    void shouldSkipUncompletedPage() throws IOException {
+    void should_skip_uncompleted_page() throws IOException {
         byte[] unCompletedPageData = {'O', 'g', 'g', 'S', 0, 1};
         OggPage expectedPage = createOggPage();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(Bytes.concat(unCompletedPageData, expectedPage.dump()));
@@ -113,13 +114,9 @@ class OggStreamTest {
         oggPage.setSegCount(3);
         oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255});
 
-        byte[] dataPacket1 = new byte[456];
-        Arrays.fill(dataPacket1, (byte) 1);
-        oggPage.addOggDataPacket(dataPacket1);
+        oggPage.addOggDataPacket(TestUtil.createBinary(456, (byte) 1));
+        oggPage.addOggDataPacket(TestUtil.createBinary(255, (byte) 2));
 
-        byte[] dataPacket2 = new byte[255];
-        Arrays.fill(dataPacket2, (byte) 2);
-        oggPage.addOggDataPacket(dataPacket2);
         return oggPage;
     }
 

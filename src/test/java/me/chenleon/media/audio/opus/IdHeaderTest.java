@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class IdHeaderTest {
     @Test
-    void shouldDumpIdHeaderWithMappingFamilyZeroToByteArray() {
+    void should_dump_id_header_with_mapping_family_zero_to_byte_array() {
         IdHeader idHeader = IdHeader.emptyHeader();
         idHeader.setMajorVersion(0);
         idHeader.setMinorVersion(1);
@@ -22,7 +22,7 @@ class IdHeaderTest {
     }
 
     @Test
-    void shouldDumpIdHeaderWithNonZeroMappingFamilyToByteArray() {
+    void should_dump_id_header_with_non_zero_mapping_family_to_byte_array() {
         IdHeader idHeader = IdHeader.emptyHeader();
         idHeader.setMajorVersion(0);
         idHeader.setMinorVersion(1);
@@ -42,7 +42,7 @@ class IdHeaderTest {
     }
 
     @Test
-    void shouldCreateNonZeroMappingFamilyIdHeaderFromBinaryData() {
+    void should_Create_Non_Zero_Mapping_Family_Id_Header_From_Binary_Data() {
         byte[] data = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd', 1, 3, 127, 0, (byte) 128, 62, 0, 0, 0, 0, 1, 2, 1,
                 0, 1, 2};
         IdHeader idHeader = IdHeader.from(data);
@@ -59,7 +59,7 @@ class IdHeaderTest {
     }
 
     @Test
-    void shouldCreateZeroMappingFamilyIdHeaderFromBinaryData() {
+    void should_create_zero_mapping_family_id_header_from_binary_data() {
         byte[] data = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd', 1, 2, 127, 0, (byte) 128, 62, 0, 0, 0, 0, 0};
         IdHeader idHeader = IdHeader.from(data);
         assertEquals(0, idHeader.getMajorVersion());
@@ -74,7 +74,7 @@ class IdHeaderTest {
     }
 
     @Test
-    void shouldThrowExceptionGivenBinaryNotStartWithCorrectSignature() {
+    void should_throw_exception_given_binary_not_start_with_correct_signature() {
         byte[] data = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'e'};
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
             IdHeader.from(data);
@@ -83,7 +83,7 @@ class IdHeaderTest {
     }
 
     @Test
-    void shouldThrowExceptionGivenChannelCountLessThanZero() {
+    void should_throw_exception_given_channel_count_less_than_zero() {
         byte[] data = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd', 1, 0, 127, 0, (byte) 128, 62, 0, 0, 0, 0, 0};
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
             IdHeader.from(data);
@@ -92,7 +92,7 @@ class IdHeaderTest {
     }
 
     @Test
-    void shouldThrowExceptionGivenChannelCountGreatThan2ForMappingFamilyZero() {
+    void should_throw_exception_given_channel_count_great_than_2_for_mapping_family_zero() {
         byte[] data = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd', 1, 3, 127, 0, (byte) 128, 62, 0, 0, 0, 0, 0};
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
             IdHeader.from(data);
@@ -101,7 +101,7 @@ class IdHeaderTest {
     }
 
     @Test
-    void shouldThrowExceptionGivenChannelCountGreatThan8ForMappingFamilyOne() {
+    void should_throw_exception_given_channel_count_great_than_8_for_mapping_family_one() {
         byte[] data = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd', 1, 9, 127, 0, (byte) 128, 62, 0, 0, 0, 0, 1};
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
             IdHeader.from(data);
@@ -110,7 +110,7 @@ class IdHeaderTest {
     }
 
     @Test
-    void shouldThrowExceptionGivenNotEnoughBinaryData() {
+    void should_throw_exception_given_not_enough_binary_data() {
         byte[] data = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd', 1, 3, 127, 0, (byte) 128, 62, 0, 0, 0, 0};
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
             IdHeader.from(data);
