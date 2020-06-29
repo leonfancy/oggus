@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
+import static me.chenleon.media.TestUtil.assertOpusPacketEqual;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OpusPacketsTest {
@@ -254,20 +255,6 @@ class OpusPacketsTest {
 
         for (OpusPacket opusPacket : opusPackets) {
             assertOpusPacketEqual(expectedPacket, opusPacket);
-        }
-    }
-
-    private void assertOpusPacketEqual(OpusPacket expected, OpusPacket actual) {
-        assertEquals(expected.getCode(), actual.getCode());
-        assertEquals(expected.getConfig().getId(), actual.getConfig().getId());
-        assertEquals(expected.isMono(), actual.isMono());
-        assertEquals(expected.isVbr(), actual.isVbr());
-        assertEquals(expected.hasPadding(), actual.hasPadding());
-        assertEquals(expected.getPadLenBytesSum(), actual.getPadLenBytesSum());
-        assertEquals(expected.getFrameCount(), actual.getFrameCount());
-        assertEquals(expected.getFrames().size(), actual.getFrames().size());
-        for (int i = 0; i < expected.getFrames().size(); i++) {
-            assertArrayEquals(expected.getFrames().get(i), actual.getFrames().get(i));
         }
     }
 }

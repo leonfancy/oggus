@@ -10,15 +10,14 @@ import java.util.List;
 public class OggPage {
     public static final byte[] CAPTURE_PATTERN = {'O', 'g', 'g', 'S'};
     public static final int MAX_LACE_VALUE = 255;
-    private int version;
+    private int version = 0;
     private byte flag = 0x00;
     private long granulePosition;
     private long serialNum;
     private long seqNum;
     private int checkSum;
-    private int segCount;
     private byte[] laceValues;
-    private final List<byte[]> oggDataPackets = new LinkedList<>();
+    private final List<byte[]> dataPackets = new LinkedList<>();
 
     public int getVersion() {
         return version;
@@ -89,11 +88,7 @@ public class OggPage {
     }
 
     public int getSegCount() {
-        return segCount;
-    }
-
-    public void setSegCount(int segCount) {
-        this.segCount = segCount;
+        return laceValues != null ? laceValues.length : 0;
     }
 
     public void setLaceValues(byte[] laceValues) {
@@ -105,15 +100,15 @@ public class OggPage {
     }
 
     public boolean isCompleted() {
-        return Byte.toUnsignedInt(laceValues[segCount - 1]) < MAX_LACE_VALUE;
+        return Byte.toUnsignedInt(laceValues[getSegCount() - 1]) < MAX_LACE_VALUE;
     }
 
-    public void addOggDataPacket(byte[] data) {
-        oggDataPackets.add(data);
+    public void addDataPacket(byte[] data) {
+        dataPackets.add(data);
     }
 
-    public List<byte[]> getOggDataPackets() {
-        return oggDataPackets;
+    public List<byte[]> getDataPackets() {
+        return dataPackets;
     }
 
     public byte[] dump() {
@@ -128,10 +123,10 @@ public class OggPage {
             out.writeInt((int) serialNum);
             out.writeInt((int) seqNum);
             out.writeInt(checkSum);
-            out.write(segCount);
+            out.write(getSegCount());
             out.write(laceValues);
-            for (byte[] oggDataPacket : oggDataPackets) {
-                out.write(oggDataPacket);
+            for (byte[] dataPacket : dataPackets) {
+                out.write(dataPacket);
             }
         } catch (IOException e) {
             throw new DumpException("OggPage dump to byte array error", e);

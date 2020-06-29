@@ -55,7 +55,6 @@ class OggPageTest {
     @Test
     void should_correctly_return_is_completed_status() {
         OggPage oggPage = new OggPage();
-        oggPage.setSegCount(3);
         oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255});
 
         assertFalse(oggPage.isCompleted());
@@ -76,16 +75,15 @@ class OggPageTest {
         oggPage.setSerialNum(0xffffffff);
         oggPage.setSeqNum(1025);
         oggPage.setCheckSum(0);
-        oggPage.setSegCount(3);
         oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255});
 
         byte[] dataPacket1 = new byte[456];
         Arrays.fill(dataPacket1, (byte) 1);
-        oggPage.addOggDataPacket(dataPacket1);
+        oggPage.addDataPacket(dataPacket1);
 
         byte[] dataPacket2 = new byte[255];
         Arrays.fill(dataPacket2, (byte) 2);
-        oggPage.addOggDataPacket(dataPacket2);
+        oggPage.addDataPacket(dataPacket2);
 
         byte[] dumpData = oggPage.dump();
 

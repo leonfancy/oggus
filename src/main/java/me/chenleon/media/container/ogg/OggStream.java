@@ -60,7 +60,7 @@ public class OggStream {
         return null;
     }
 
-    public boolean hasNextPage() throws IOException {
+    private boolean hasNextPage() throws IOException {
         int posOfPattern = 0;
         while (posOfPattern < CAPTURE_PATTERN.length) {
             int b = in.read();
@@ -76,7 +76,7 @@ public class OggStream {
         return true;
     }
 
-    public OggPage nextPage() throws IOException {
+    private OggPage nextPage() throws IOException {
         OggPage oggPage = new OggPage();
         oggPage.setVersion(in.readUnsignedByte());
         oggPage.setFlag(in.readByte());
@@ -84,8 +84,8 @@ public class OggStream {
         oggPage.setSerialNum(Integer.toUnsignedLong(in.readInt()));
         oggPage.setSeqNum(Integer.toUnsignedLong(in.readInt()));
         oggPage.setCheckSum(in.readInt());
-        oggPage.setSegCount(in.readUnsignedByte());
-        byte[] laceValues = in.readNBytes(oggPage.getSegCount());
+        int segCount = in.readUnsignedByte();
+        byte[] laceValues = in.readNBytes(segCount);
         oggPage.setLaceValues(laceValues);
 
         int packetLen = 0;
@@ -94,13 +94,13 @@ public class OggStream {
             packetLen += segLen;
             if (segLen < MAX_LACE_VALUE) {
                 byte[] data = in.readNBytes(packetLen);
-                oggPage.addOggDataPacket(data);
+                oggPage.addDataPacket(data);
                 packetLen = 0;
             }
         }
         if (packetLen != 0) {
             byte[] data = in.readNBytes(packetLen);
-            oggPage.addOggDataPacket(data);
+            oggPage.addDataPacket(data);
         }
         return oggPage;
     }
