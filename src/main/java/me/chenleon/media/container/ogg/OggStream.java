@@ -86,7 +86,6 @@ public class OggStream {
         oggPage.setCheckSum(in.readInt());
         int segCount = in.readUnsignedByte();
         byte[] laceValues = in.readNBytes(segCount);
-        oggPage.setLaceValues(laceValues);
 
         int packetLen = 0;
         for (byte laceValue : laceValues) {
@@ -100,7 +99,7 @@ public class OggStream {
         }
         if (packetLen != 0) {
             byte[] data = in.readNBytes(packetLen);
-            oggPage.addDataPacket(data);
+            oggPage.addPartialDataPacket(data);
         }
         return oggPage;
     }

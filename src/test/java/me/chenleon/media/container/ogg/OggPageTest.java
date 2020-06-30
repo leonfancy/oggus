@@ -1,6 +1,8 @@
 package me.chenleon.media.container.ogg;
 
 import com.google.common.primitives.Bytes;
+import me.chenleon.media.TestUtil;
+import me.chenleon.media.audio.opus.InvalidOpusException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -55,15 +57,13 @@ class OggPageTest {
     @Test
     void should_correctly_return_is_completed_status() {
         OggPage oggPage = new OggPage();
-        oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255});
+        oggPage.addDataPacket(TestUtil.createBinary(256, (byte) 1));
+
+        assertTrue(oggPage.isCompleted());
+
+        oggPage.addPartialDataPacket(TestUtil.createBinary(255, (byte) 1));
 
         assertFalse(oggPage.isCompleted());
-
-        for (int laceValue = 0; laceValue < 254; laceValue++) {
-            oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) laceValue});
-
-            assertTrue(oggPage.isCompleted());
-        }
     }
 
     @Test
@@ -75,15 +75,12 @@ class OggPageTest {
         oggPage.setSerialNum(0xffffffff);
         oggPage.setSeqNum(1025);
         oggPage.setCheckSum(0);
-        oggPage.setLaceValues(new byte[]{(byte) 255, (byte) 201, (byte) 255});
 
-        byte[] dataPacket1 = new byte[456];
-        Arrays.fill(dataPacket1, (byte) 1);
+        byte[] dataPacket1 = TestUtil.createBinary(456, (byte) 1);
         oggPage.addDataPacket(dataPacket1);
 
-        byte[] dataPacket2 = new byte[255];
-        Arrays.fill(dataPacket2, (byte) 2);
-        oggPage.addDataPacket(dataPacket2);
+        byte[] dataPacket2 = TestUtil.createBinary(255, (byte) 2);
+        oggPage.addPartialDataPacket(dataPacket2);
 
         byte[] dumpData = oggPage.dump();
 
@@ -98,5 +95,37 @@ class OggPageTest {
         byte[] expectedBytes = Bytes.concat(headerBytes, dataPacket1, dataPacket2);
 
         assertArrayEquals(expectedBytes, dumpData);
+    }
+
+    @Test
+    void should_gen_lace_values_when_adding_partial_data_packet() {
+        OggPage oggPage = new OggPage();
+        oggPage.addDataPacket(TestUtil.createBinary(256, (byte) 1));
+
+        assertEquals(2, oggPage.getSegCount());
+        assertArrayEquals(new byte[]{(byte) 255, 1}, oggPage.getLaceValues());
+
+        oggPage.addDataPacket(TestUtil.createBinary(255, (byte) 2));
+        assertEquals(4, oggPage.getSegCount());
+        assertArrayEquals(new byte[]{(byte) 255, 1, (byte) 255, 0}, oggPage.getLaceValues());
+    }
+
+    @Test
+    void should_add_partial_data_packet() {
+        OggPage oggPage = new OggPage();
+        oggPage.addPartialDataPacket(TestUtil.createBinary(510, (byte) 1));
+
+        assertEquals(2, oggPage.getSegCount());
+        assertArrayEquals(new byte[]{(byte) 255, (byte) 255}, oggPage.getLaceValues());
+    }
+
+    @Test
+    void should_throw_exception_when_adding_partial_data_packet_and_the_length_is_not_multiple_of_255() {
+        OggPage oggPage = new OggPage();
+        InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
+            oggPage.addPartialDataPacket(TestUtil.createBinary(511, (byte) 1));
+        });
+
+        assertEquals("Not a partial data packet", exception.getMessage());
     }
 }

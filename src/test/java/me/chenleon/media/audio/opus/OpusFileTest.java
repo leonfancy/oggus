@@ -30,7 +30,6 @@ class OpusFileTest {
         oggPage1.setGranulePosition(0);
         oggPage1.setSerialNum(1);
         oggPage1.setSeqNum(0);
-        oggPage1.setLaceValues(lenToLaceValues(idHeaderData.length));
         oggPage1.addDataPacket(idHeaderData);
 
         CommentHeader commentHeader = CommentHeader.emptyHeader();
@@ -43,7 +42,6 @@ class OpusFileTest {
         oggPage2.setGranulePosition(0);
         oggPage2.setSerialNum(1);
         oggPage2.setSeqNum(1);
-        oggPage2.setLaceValues(lenToLaceValues(commentHeaderData.length));
         oggPage2.addDataPacket(commentHeaderData);
 
         OpusPacket opusPacket = OpusPackets.newPacketOfCode(0);
@@ -55,7 +53,6 @@ class OpusFileTest {
         oggPage3.setGranulePosition(0);
         oggPage3.setSerialNum(1);
         oggPage3.setSeqNum(2);
-        oggPage3.setLaceValues(lenToLaceValues(audioData.length));
         oggPage3.addDataPacket(audioData);
 
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
@@ -84,15 +81,6 @@ class OpusFileTest {
         idHeader.setOutputGain(0);
         idHeader.setChannelMappingFamily(0);
         return idHeader;
-    }
-
-    private byte[] lenToLaceValues(int len) {
-        int countOf255 = len / 255;
-        int lastValue = len % 255;
-        byte[] laceValues = new byte[countOf255 + 1];
-        Arrays.fill(laceValues, 0, countOf255, (byte) 255);
-        laceValues[countOf255] = (byte) lastValue;
-        return laceValues;
     }
 
     @Test

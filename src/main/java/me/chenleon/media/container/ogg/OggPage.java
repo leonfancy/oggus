@@ -1,9 +1,12 @@
 package me.chenleon.media.container.ogg;
 
 import com.google.common.io.LittleEndianDataOutputStream;
+import com.google.common.primitives.Bytes;
+import me.chenleon.media.audio.opus.InvalidOpusException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +19,7 @@ public class OggPage {
     private long serialNum;
     private long seqNum;
     private int checkSum;
-    private byte[] laceValues;
+    private byte[] laceValues = new byte[0];
     private final List<byte[]> dataPackets = new LinkedList<>();
 
     public int getVersion() {
@@ -91,10 +94,6 @@ public class OggPage {
         return laceValues != null ? laceValues.length : 0;
     }
 
-    public void setLaceValues(byte[] laceValues) {
-        this.laceValues = laceValues;
-    }
-
     public byte[] getLaceValues() {
         return laceValues;
     }
@@ -104,6 +103,15 @@ public class OggPage {
     }
 
     public void addDataPacket(byte[] data) {
+        laceValues = Bytes.concat(laceValues, lenToLaceValues(data.length, false));
+        dataPackets.add(data);
+    }
+
+    public void addPartialDataPacket(byte[] data) {
+        if (data.length % 255 != 0) {
+            throw new InvalidOpusException("Not a partial data packet");
+        }
+        laceValues = Bytes.concat(laceValues, lenToLaceValues(data.length, true));
         dataPackets.add(data);
     }
 
@@ -132,5 +140,20 @@ public class OggPage {
             throw new DumpException("OggPage dump to byte array error", e);
         }
         return byteArrayOutputStream.toByteArray();
+    }
+
+    private byte[] lenToLaceValues(int len, boolean isPartial) {
+        int countOf255 = len / 255;
+        if (isPartial) {
+            byte[] laceValues = new byte[countOf255];
+            Arrays.fill(laceValues, (byte) 255);
+            return laceValues;
+        } else {
+            int lastValue = len % 255;
+            byte[] laceValues = new byte[countOf255 + 1];
+            Arrays.fill(laceValues, 0, countOf255, (byte) 255);
+            laceValues[countOf255] = (byte) lastValue;
+            return laceValues;
+        }
     }
 }
