@@ -31,8 +31,7 @@ class OpusFileTest {
         CommentHeader commentHeader = createCommentHeader();
         OggPage oggPage2 = createOggPage(0, 1, commentHeader.dump());
 
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(0);
-        opusPacket.setConfig(Config.of(0));
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(0), Channel.MONO, 0);
         opusPacket.addFrame(createBinary(100, (byte) 1));
         byte[] audioData = opusPacket.dumpToStandardFormat();
         OggPage oggPage3 = createOggPage(40, 2, audioData);
@@ -189,7 +188,7 @@ class OpusFileTest {
                 Config config = opusPacket.getConfig();
                 System.out.printf("Bandwidth: %d Hz, Mode: %s, Frame Size: %.1f ms, Code: %d, Frame Count: %d, Channel: %s\n",
                         config.getBandwidth().getHz(), config.getEncodeMode(), config.getFrameSize(),
-                        opusPacket.getCode(), opusPacket.getFrames().size(), opusPacket.isMono() ? "mono" : "stereo");
+                        opusPacket.getCode(), opusPacket.getFrames().size(), opusPacket.getChannel());
             }
             count++;
         }

@@ -16,8 +16,8 @@ public class TestUtil {
 
     public static void assertOpusPacketEqual(OpusPacket expected, OpusPacket actual) {
         assertEquals(expected.getCode(), actual.getCode());
-        assertEquals(expected.getConfig().getId(), actual.getConfig().getId());
-        assertEquals(expected.isMono(), actual.isMono());
+        assertEquals(expected.getConfig(), actual.getConfig());
+        assertEquals(expected.getChannel(), actual.getChannel());
         assertEquals(expected.isVbr(), actual.isVbr());
         assertEquals(expected.hasPadding(), actual.hasPadding());
         assertEquals(expected.getPadLenBytesSum(), actual.getPadLenBytesSum());

@@ -7,25 +7,19 @@ import java.util.List;
 
 public class OpusPackets {
     /**
-     * Create a {@code OpusPacket} with given code, see
+     * Create a {@code OpusPacket} with given {@code config}, {@code channel} and {@code code}, see
      * <a href=https://tools.ietf.org/html/rfc6716#section-3.2>RFC6716 Section-3.2</a>.
      *
+     * @param config the config from 0 ~ 31
+     * @param channel stereo or mono
      * @param code the Opus packet code
      * @return the OpusPacket object
      */
-    public static OpusPacket newPacketOfCode(int code) {
-        switch (code) {
-            case 0:
-                return new CodeZeroPacket();
-            case 1:
-                return new CodeOnePacket();
-            case 2:
-                return new CodeTwoPacket();
-            case 3:
-                return new CodeThreePacket();
-            default:
-                throw new IllegalArgumentException("Invalid Opus packet code: " + code);
-        }
+    public static OpusPacket newPacket(Config config, Channel channel, int code) {
+        OpusPacket opusPacket = newPacketOfCode(code);
+        opusPacket.setConfig(config);
+        opusPacket.setChannel(channel);
+        return opusPacket;
     }
 
     /**
@@ -35,10 +29,9 @@ public class OpusPackets {
      */
     public static OpusPacket newPacketOfToc(int toc) {
         int code = toc & 0x03;
-        OpusPacket opusPacket = newPacketOfCode(code);
-        opusPacket.config = Config.of(toc >> 3);
-        opusPacket.isMono = (toc & 0x04) == 0;
-        return opusPacket;
+        Config config = Config.of(toc >> 3);
+        Channel channel = (toc & 0x04) == 0 ? Channel.MONO : Channel.STEREO;
+        return newPacket(config, channel, code);
     }
 
     /**
@@ -72,6 +65,21 @@ public class OpusPackets {
      */
     public static OpusPacket from(byte[] data) {
         return from(data, 1).get(0);
+    }
+
+    private static OpusPacket newPacketOfCode(int code) {
+        switch (code) {
+            case 0:
+                return new CodeZeroPacket();
+            case 1:
+                return new CodeOnePacket();
+            case 2:
+                return new CodeTwoPacket();
+            case 3:
+                return new CodeThreePacket();
+            default:
+                throw new IllegalArgumentException("Invalid Opus packet code: " + code);
+        }
     }
 
     private static OpusPacket readStandardOpusPacket(ByteArrayInputStream in) throws IOException {

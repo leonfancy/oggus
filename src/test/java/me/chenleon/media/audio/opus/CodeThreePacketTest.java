@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CodeThreePacketTest {
     @Test
     void should_create_packet_and_set_fields_correctly() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 3);
         opusPacket.setVbr(true);
         opusPacket.setFrameCount(10);
         opusPacket.setHasPadding(true);
@@ -26,9 +26,7 @@ class CodeThreePacketTest {
 
     @Test
     void should_dump_to_standard_and_self_delimiting_format_given_vbr_no_padding_packet() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
-        opusPacket.setConfig(Config.of(12));
-        opusPacket.setMono(false);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 3);
         opusPacket.setVbr(true);
         opusPacket.setFrameCount(3);
         opusPacket.setHasPadding(false);
@@ -52,9 +50,7 @@ class CodeThreePacketTest {
 
     @Test
     void should_dump_to_standard_and_self_delimiting_format_given_cbr_no_padding_packet() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
-        opusPacket.setConfig(Config.of(12));
-        opusPacket.setMono(false);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 3);
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(3);
         opusPacket.setHasPadding(false);
@@ -78,9 +74,7 @@ class CodeThreePacketTest {
     @ParameterizedTest
     @CsvSource({"0", "1", "123", "253", "254"})
     void should_dump_to_standard_and_self_delimiting_format_given_packet_with_padding_length_less_than_255(int length) {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
-        opusPacket.setConfig(Config.of(12));
-        opusPacket.setMono(false);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 3);
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(1);
         opusPacket.setHasPadding(true);
@@ -101,9 +95,7 @@ class CodeThreePacketTest {
 
     @Test
     void should_dump_to_standard_and_self_delimiting_format_given_packet_with_padding_length_255() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
-        opusPacket.setConfig(Config.of(12));
-        opusPacket.setMono(false);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 3);
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(1);
         opusPacket.setHasPadding(true);
@@ -124,9 +116,7 @@ class CodeThreePacketTest {
 
     @Test
     void should_dump_to_standard_and_self_delimiting_format_given_packet_with_padding_length_256() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
-        opusPacket.setConfig(Config.of(12));
-        opusPacket.setMono(false);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 3);
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(1);
         opusPacket.setHasPadding(true);
@@ -147,9 +137,7 @@ class CodeThreePacketTest {
 
     @Test
     void should_dump_to_standard_and_self_delimiting_format_given_packet_with_padding_length_511() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(3);
-        opusPacket.setConfig(Config.of(12));
-        opusPacket.setMono(false);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 3);
         opusPacket.setVbr(false);
         opusPacket.setFrameCount(1);
         opusPacket.setHasPadding(true);

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CodeZeroPacketTest {
     @Test
     void should_create_empty_packet_correctly() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(0);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 0);
         assertEquals(0, opusPacket.getCode());
         assertFalse(opusPacket.isVbr());
         assertFalse(opusPacket.hasPadding());
@@ -19,9 +19,7 @@ class CodeZeroPacketTest {
 
     @Test
     void should_dump_to_standard_and_self_delimiting_format_correctly() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(0);
-        opusPacket.setConfig(Config.of(12));
-        opusPacket.setMono(false);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 0);
         byte[] frameData = TestUtil.createBinary(513, (byte) 1);
         opusPacket.addFrame(frameData);
         byte[] standardBytes = opusPacket.dumpToStandardFormat();
@@ -32,9 +30,7 @@ class CodeZeroPacketTest {
 
     @Test
     void should_dump_to_binary_given_a_zero_frame_packet() {
-        OpusPacket opusPacket = OpusPackets.newPacketOfCode(0);
-        opusPacket.setConfig(Config.of(12));
-        opusPacket.setMono(false);
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(12), Channel.STEREO, 0);
         assertArrayEquals(new byte[]{100}, opusPacket.dumpToStandardFormat());
         assertArrayEquals(new byte[]{100, 0}, opusPacket.dumpToSelfDelimitingFormat());
     }

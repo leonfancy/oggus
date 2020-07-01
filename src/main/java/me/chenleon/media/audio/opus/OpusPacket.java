@@ -8,7 +8,7 @@ import java.util.List;
  */
 public abstract class OpusPacket {
     protected Config config;
-    protected boolean isMono;
+    protected Channel channel;
     protected final List<byte[]> frames = new LinkedList<>();
 
     /**
@@ -39,15 +39,12 @@ public abstract class OpusPacket {
         this.config = config;
     }
 
-    /**
-     * @return {@code true} if this is mono stream.
-     */
-    public boolean isMono() {
-        return isMono;
+    public Channel getChannel() {
+        return channel;
     }
 
-    public void setMono(boolean mono) {
-        isMono = mono;
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
 
     /**
@@ -96,7 +93,7 @@ public abstract class OpusPacket {
 
     protected int getTocByte() {
         int toc = config.getId() << 3;
-        if (!isMono) {
+        if (channel == Channel.STEREO) {
             toc = toc | 0x04;
         }
         toc = toc | getCode();
