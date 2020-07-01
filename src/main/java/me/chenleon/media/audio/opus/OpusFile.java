@@ -5,6 +5,7 @@ import me.chenleon.media.container.ogg.OggPage;
 import me.chenleon.media.container.ogg.OggStream;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,14 @@ public class OpusFile {
         idHeader = readIdHeader(oggStream);
         commentHeader = readCommentHeader(oggStream);
         this.oggStream = oggStream;
+    }
+
+    public static OpusFile from(InputStream inputStream) throws IOException {
+        return new OpusFile(new OggStream(inputStream));
+    }
+
+    public static OpusFile from(String filename) throws IOException {
+        return new OpusFile(new OggStream(filename));
     }
 
     private IdHeader readIdHeader(OggStream oggStream) throws IOException {
@@ -54,7 +63,7 @@ public class OpusFile {
             OggPage currentPage = oggStream.readPage(streamId);
             List<byte[]> currentPagePackets = currentPage.getDataPackets();
             if (currentPagePackets.size() != 1) {
-                throw new InvalidOpusException("Comment Header ogg pages must only contain 1 data packet");
+                throw new InvalidOpusException("Comment Header Ogg pages must only contain 1 data packet");
             }
             commentHeaderData = Bytes.concat(commentHeaderData, currentPagePackets.get(0));
             if (currentPage.getGranulePosition() == 0) break;
