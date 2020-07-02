@@ -108,11 +108,7 @@ public class OpusFile {
 
         byte[] data = lastPageLeftAudioDataPackets.poll();
 
-        if (!lastPageLeftAudioDataPackets.isEmpty()) {
-            return AudioDataPacket.from(data, idHeader.getStreamCount());
-        }
-
-        if (isLastReadPageCompleted) {
+        if (isLastReadPageCompleted || !lastPageLeftAudioDataPackets.isEmpty()) {
             return AudioDataPacket.from(data, idHeader.getStreamCount());
         }
 

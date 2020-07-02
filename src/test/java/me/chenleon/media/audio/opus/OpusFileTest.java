@@ -19,6 +19,7 @@ import static me.chenleon.media.TestUtil.assertOpusPacketEqual;
 import static me.chenleon.media.TestUtil.createBinary;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OpusFileTest {
@@ -35,6 +36,7 @@ class OpusFileTest {
         opusPacket.addFrame(createBinary(100, (byte) 1));
         byte[] audioData = opusPacket.dumpToStandardFormat();
         OggPage oggPage3 = createOggPage(40, 2, audioData);
+        oggPage3.setEOS();
 
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
 
@@ -49,6 +51,8 @@ class OpusFileTest {
 
         AudioDataPacket audioDataPacket = opusFile.readAudioPacket();
         assertOpusPacketEqual(opusPacket, audioDataPacket.getOpusPackets().get(0));
+
+        assertNull(opusFile.readAudioPacket());
     }
 
     @Test
@@ -116,6 +120,139 @@ class OpusFileTest {
         });
 
         assertEquals("Comment Header Ogg pages must only contain 1 data packet", exception.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_ogg_stream_eos_flag_is_not_set() throws IOException {
+        IdHeader idHeader = createIdHeader();
+        OggPage oggPage1 = createOggPage(0, 0, idHeader.dump());
+        oggPage1.setBOS();
+
+        CommentHeader commentHeader = createCommentHeader();
+        OggPage oggPage2 = createOggPage(0, 1, commentHeader.dump());
+
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(0), Channel.MONO, 0);
+        opusPacket.addFrame(createBinary(100, (byte) 1));
+        byte[] audioData = opusPacket.dumpToStandardFormat();
+        OggPage oggPage3 = createOggPage(40, 2, audioData);
+
+        byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
+
+        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+
+        opusFile.readAudioPacket();
+
+        InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
+            opusFile.readAudioPacket();
+        });
+
+        assertEquals("Corrupted opus binary data", exception.getMessage());
+    }
+
+    @Test
+    void should_read_ogg_stream_with_audio_data_packet_spans_two_page() throws IOException {
+        IdHeader idHeader = createIdHeader();
+        OggPage oggPage1 = createOggPage(0, 0, idHeader.dump());
+        oggPage1.setBOS();
+
+        CommentHeader commentHeader = createCommentHeader();
+        OggPage oggPage2 = createOggPage(0, 1, commentHeader.dump());
+
+        OpusPacket opusPacket = OpusPackets.newPacket(Config.of(0), Channel.MONO, 0);
+        opusPacket.addFrame(createBinary(255 * 255 + 256, (byte) 1));
+        byte[] audioData = opusPacket.dumpToStandardFormat();
+        OggPage oggPage3 = createOggPage(-1, 2);
+        oggPage3.addPartialDataPacket(Arrays.copyOfRange(audioData, 0, 255 * 255));
+        OggPage oggPage4 = createOggPage(40, 3);
+        oggPage4.addDataPacket(Arrays.copyOfRange(audioData, 255 * 255, audioData.length));
+        oggPage4.setEOS();
+
+        byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump(), oggPage4.dump());
+
+        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+
+        AudioDataPacket audioDataPacket = opusFile.readAudioPacket();
+        assertEquals(1, audioDataPacket.getOpusPackets().size());
+        assertOpusPacketEqual(opusPacket, audioDataPacket.getOpusPackets().get(0));
+    }
+
+    @Test
+    void should_read_ogg_stream_with_a_page_that_contains_multiple_packets() throws IOException {
+        OggPage oggPage1 = createOggPage(0, 0, createIdHeader().dump());
+        oggPage1.setBOS();
+
+        OggPage oggPage2 = createOggPage(0, 1, createCommentHeader().dump());
+
+        OpusPacket opusPacket1 = OpusPackets.newPacket(Config.of(0), Channel.MONO, 0);
+        opusPacket1.addFrame(createBinary(100, (byte) 1));
+        byte[] audioData1 = opusPacket1.dumpToStandardFormat();
+
+        OpusPacket opusPacket2 = OpusPackets.newPacket(Config.of(0), Channel.MONO, 0);
+        opusPacket2.addFrame(createBinary(100, (byte) 2));
+        byte[] audioData2 = opusPacket2.dumpToStandardFormat();
+
+        OpusPacket opusPacket3 = OpusPackets.newPacket(Config.of(0), Channel.MONO, 0);
+        opusPacket3.addFrame(createBinary(100, (byte) 3));
+        byte[] audioData3 = opusPacket2.dumpToStandardFormat();
+
+        OggPage oggPage3 = createOggPage(120, 2, audioData1, audioData2, audioData3);
+        oggPage3.setEOS();
+
+        byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
+
+        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+
+        AudioDataPacket audioDataPacket1 = opusFile.readAudioPacket();
+        assertEquals(1, audioDataPacket1.getOpusPackets().size());
+        assertOpusPacketEqual(opusPacket1, audioDataPacket1.getOpusPackets().get(0));
+
+        AudioDataPacket audioDataPacket2 = opusFile.readAudioPacket();
+        assertOpusPacketEqual(opusPacket2, audioDataPacket2.getOpusPackets().get(0));
+
+        opusFile.readAudioPacket();
+
+        assertNull(opusFile.readAudioPacket());
+    }
+
+    @Test
+    void should_read_ogg_stream_with_a_page_that_contains_a_complete_and_a_partial_packet() throws IOException {
+        OggPage oggPage1 = createOggPage(0, 0, createIdHeader().dump());
+        oggPage1.setBOS();
+
+        OggPage oggPage2 = createOggPage(0, 1, createCommentHeader().dump());
+
+        OpusPacket opusPacket1 = OpusPackets.newPacket(Config.of(0), Channel.MONO, 0);
+        opusPacket1.addFrame(createBinary(100, (byte) 1));
+        byte[] audioData1 = opusPacket1.dumpToStandardFormat();
+
+        OpusPacket opusPacket2 = OpusPackets.newPacket(Config.of(0), Channel.MONO, 0);
+        opusPacket2.addFrame(createBinary(255 * 255 * 2, (byte) 2));
+        byte[] audioData2 = opusPacket2.dumpToStandardFormat();
+
+        OggPage oggPage3 = createOggPage(40, 2, audioData1);
+        int leftRoom = (255 - oggPage3.getSegCount()) * 255;
+        oggPage3.addPartialDataPacket(Arrays.copyOfRange(audioData2, 0, leftRoom));
+
+        OggPage oggPage4 = createOggPage(-1, 2);
+        oggPage4.addPartialDataPacket(Arrays.copyOfRange(audioData2, leftRoom, leftRoom + 255 * 255));
+
+        OggPage oggPage5 = createOggPage(80, 2);
+        oggPage5.addDataPacket(Arrays.copyOfRange(audioData2, leftRoom + 255 * 255, audioData2.length));
+        oggPage5.setEOS();
+
+        byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump(), oggPage4.dump(),
+                oggPage5.dump());
+
+        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+
+        AudioDataPacket audioDataPacket1 = opusFile.readAudioPacket();
+        assertEquals(1, audioDataPacket1.getOpusPackets().size());
+        assertOpusPacketEqual(opusPacket1, audioDataPacket1.getOpusPackets().get(0));
+
+        AudioDataPacket audioDataPacket2 = opusFile.readAudioPacket();
+        assertOpusPacketEqual(opusPacket2, audioDataPacket2.getOpusPackets().get(0));
+
+        assertNull(opusFile.readAudioPacket());
     }
 
     private CommentHeader createCommentHeader() {
