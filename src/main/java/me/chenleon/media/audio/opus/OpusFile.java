@@ -103,17 +103,17 @@ public class OpusFile {
                     break;
                 }
             }
-            return new AudioDataPacket(data, idHeader.getStreamCount());
+            return AudioDataPacket.from(data, idHeader.getStreamCount());
         }
 
         byte[] data = lastPageLeftAudioDataPackets.poll();
 
         if (!lastPageLeftAudioDataPackets.isEmpty()) {
-            return new AudioDataPacket(data, idHeader.getStreamCount());
+            return AudioDataPacket.from(data, idHeader.getStreamCount());
         }
 
         if (isLastReadPageCompleted) {
-            return new AudioDataPacket(data, idHeader.getStreamCount());
+            return AudioDataPacket.from(data, idHeader.getStreamCount());
         }
 
         while (true) {
@@ -129,6 +129,6 @@ public class OpusFile {
                 break;
             }
         }
-        return new AudioDataPacket(data, idHeader.getStreamCount());
+        return AudioDataPacket.from(data, idHeader.getStreamCount());
     }
 }

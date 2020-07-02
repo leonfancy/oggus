@@ -1,16 +1,19 @@
 package me.chenleon.media.audio.opus;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AudioDataPacket {
     private final List<OpusPacket> opusPackets = new ArrayList<>();
 
-    public AudioDataPacket(byte[] data, int streamCount) {
-        opusPackets.addAll(OpusPackets.from(data, streamCount));
+    private AudioDataPacket() {
     }
 
-    private AudioDataPacket() {
+    public static AudioDataPacket from(byte[] data, int streamCount) {
+        AudioDataPacket audioDataPacket = new AudioDataPacket();
+        audioDataPacket.opusPackets.addAll(OpusPackets.from(data, streamCount));
+        return audioDataPacket;
     }
 
     public static AudioDataPacket empty() {
@@ -23,5 +26,19 @@ public class AudioDataPacket {
 
     public List<OpusPacket> getOpusPackets() {
         return opusPackets;
+    }
+
+    public byte[] dump() {
+        int packetCount = opusPackets.size();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        for (int i = 0; i < packetCount - 1; i++) {
+            byte[] data = opusPackets.get(i).dumpToSelfDelimitingFormat();
+            outputStream.writeBytes(data);
+        }
+
+        byte[] data = opusPackets.get(packetCount - 1).dumpToStandardFormat();
+        outputStream.writeBytes(data);
+
+        return outputStream.toByteArray();
     }
 }
