@@ -1,7 +1,13 @@
 package me.chenleon.media.audio.opus;
 
-import static me.chenleon.media.audio.opus.Bandwidth.*;
-import static me.chenleon.media.audio.opus.EncodeMode.*;
+import static me.chenleon.media.audio.opus.Config.Bandwidth.FB;
+import static me.chenleon.media.audio.opus.Config.Bandwidth.MB;
+import static me.chenleon.media.audio.opus.Config.Bandwidth.NB;
+import static me.chenleon.media.audio.opus.Config.Bandwidth.SWB;
+import static me.chenleon.media.audio.opus.Config.Bandwidth.WB;
+import static me.chenleon.media.audio.opus.Config.EncodeMode.CELT;
+import static me.chenleon.media.audio.opus.Config.EncodeMode.HYBRID;
+import static me.chenleon.media.audio.opus.Config.EncodeMode.SILK;
 
 public class Config {
     private final int id;
@@ -79,5 +85,30 @@ public class Config {
 
     public int getId() {
         return id;
+    }
+
+    public enum EncodeMode {
+        SILK, HYBRID, CELT
+    }
+
+    public enum Bandwidth {
+        NB(4000, 8000), MB(6000, 12000), WB(8000, 16000),
+        SWB(12000, 24000), FB(20000, 48000);
+
+        private final int hz;
+        private final int sampleRate;
+
+        Bandwidth(int hz, int sampleRate) {
+            this.hz = hz;
+            this.sampleRate = sampleRate;
+        }
+
+        public int getHz() {
+            return hz;
+        }
+
+        public int getSampleRate() {
+            return sampleRate;
+        }
     }
 }
