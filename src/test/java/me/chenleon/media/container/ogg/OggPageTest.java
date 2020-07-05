@@ -5,14 +5,16 @@ import me.chenleon.media.TestUtil;
 import me.chenleon.media.audio.opus.InvalidOpusException;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OggPageTest {
     @Test
     void should_correctly_parse_flag() {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
 
         oggPage.setFlag((byte) 0x00);
         assertFalse(oggPage.isContinued());
@@ -31,7 +33,7 @@ class OggPageTest {
 
     @Test
     void should_correctly_set_flag() {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         oggPage.setFlag((byte) 0x00);
 
         oggPage.setContinued();
@@ -56,7 +58,7 @@ class OggPageTest {
 
     @Test
     void should_correctly_return_is_completed_status() {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         oggPage.addDataPacket(TestUtil.createBinary(256, (byte) 1));
 
         assertTrue(oggPage.isCompleted());
@@ -68,7 +70,7 @@ class OggPageTest {
 
     @Test
     void should_dump_ogg_page_to_byte_array() {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         oggPage.setVersion(0);
         oggPage.setFlag((byte) 0x01);
         oggPage.setGranulePosition(257);
@@ -99,7 +101,7 @@ class OggPageTest {
 
     @Test
     void should_gen_lace_values_when_adding_partial_data_packet() {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         oggPage.addDataPacket(TestUtil.createBinary(256, (byte) 1));
 
         assertEquals(2, oggPage.getSegCount());
@@ -112,7 +114,7 @@ class OggPageTest {
 
     @Test
     void should_add_partial_data_packet() {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         oggPage.addPartialDataPacket(TestUtil.createBinary(510, (byte) 1));
 
         assertEquals(2, oggPage.getSegCount());
@@ -121,7 +123,7 @@ class OggPageTest {
 
     @Test
     void should_throw_exception_when_adding_partial_data_packet_and_the_length_is_not_multiple_of_255() {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
             oggPage.addPartialDataPacket(TestUtil.createBinary(511, (byte) 1));
         });

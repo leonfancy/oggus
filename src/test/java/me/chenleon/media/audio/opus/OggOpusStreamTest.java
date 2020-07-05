@@ -271,7 +271,7 @@ class OggOpusStreamTest {
     }
 
     private OggPage createOggPage(int granulePosition, int seqNum) {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         oggPage.setGranulePosition(granulePosition);
         oggPage.setSerialNum(1);
         oggPage.setSeqNum(seqNum);
@@ -293,7 +293,7 @@ class OggOpusStreamTest {
     @Test
     @Disabled
     void should_read_ogg_stream() throws IOException {
-        OggOpusStream oggOpusStream = new OggOpusStream(new OggStream("audio/technology.opus"));
+        OggOpusStream oggOpusStream = new OggOpusStream(OggStream.from("audio/technology.opus"));
         IdHeader idHeader = oggOpusStream.getIdHeader();
 
         System.out.printf("Version: %d.%d\n", idHeader.getMajorVersion(), idHeader.getMinorVersion());

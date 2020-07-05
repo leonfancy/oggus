@@ -28,11 +28,11 @@ public class OggOpusStream {
     }
 
     public static OggOpusStream from(InputStream inputStream) throws IOException {
-        return new OggOpusStream(new OggStream(inputStream));
+        return new OggOpusStream(OggStream.from(inputStream));
     }
 
-    public static OggOpusStream from(String filename) throws IOException {
-        return new OggOpusStream(new OggStream(filename));
+    public static OggOpusStream from(String filePath) throws IOException {
+        return new OggOpusStream(OggStream.from(filePath));
     }
 
     private IdHeader readIdHeader(OggStream oggStream) throws IOException {

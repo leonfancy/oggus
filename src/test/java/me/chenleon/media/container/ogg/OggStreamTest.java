@@ -18,7 +18,7 @@ class OggStreamTest {
         expectedPage.setBOS();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(expectedPage.dump());
 
-        OggStream oggStream = new OggStream(inputStream);
+        OggStream oggStream = OggStream.from(inputStream);
 
         assertOggPageEquals(expectedPage, oggStream.readPage());
 
@@ -28,7 +28,7 @@ class OggStreamTest {
     @Test
     void should_not_read_ogg_page_from_empty_input_stream() throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[0]);
-        OggStream oggStream = new OggStream(inputStream);
+        OggStream oggStream = OggStream.from(inputStream);
         assertNull(oggStream.readPage());
     }
 
@@ -37,7 +37,7 @@ class OggStreamTest {
         byte[] buf = new byte[10];
         Arrays.fill(buf, (byte) 'O');
         ByteArrayInputStream inputStream = new ByteArrayInputStream(buf);
-        OggStream oggStream = new OggStream(inputStream);
+        OggStream oggStream = OggStream.from(inputStream);
         assertNull(oggStream.readPage());
     }
 
@@ -47,7 +47,7 @@ class OggStreamTest {
         byte[] invalidData = "OgOg".getBytes();
         byte[] data = Bytes.concat(invalidData, expectedPage.dump());
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-        OggStream oggStream = new OggStream(inputStream);
+        OggStream oggStream = OggStream.from(inputStream);
 
         assertOggPageEquals(expectedPage, oggStream.readPage());
     }
@@ -60,7 +60,7 @@ class OggStreamTest {
         byte[] invalidData = "OgOg".getBytes();
         byte[] data = Bytes.concat(expectedPage1.dump(), invalidData, expectedPage2.dump());
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-        OggStream oggStream = new OggStream(inputStream);
+        OggStream oggStream = OggStream.from(inputStream);
 
         assertOggPageEquals(expectedPage1, oggStream.readPage());
         assertOggPageEquals(expectedPage2, oggStream.readPage());
@@ -76,7 +76,7 @@ class OggStreamTest {
         byte[] data = Bytes.concat(expectedPage1.dump(), expectedPage2.dump(), expectedPage3.dump());
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-        OggStream oggStream = new OggStream(inputStream);
+        OggStream oggStream = OggStream.from(inputStream);
 
         assertOggPageEquals(expectedPage2, oggStream.readPage(serialNum));
         assertNull(oggStream.readPage(serialNum));
@@ -87,7 +87,7 @@ class OggStreamTest {
     void should_not_read_if_ogg_page_is_not_completed() throws IOException {
         byte[] unCompletedPageData = {'O', 'g', 'g', 'S', 0, 1};
         ByteArrayInputStream inputStream = new ByteArrayInputStream(unCompletedPageData);
-        OggStream oggStream = new OggStream(inputStream);
+        OggStream oggStream = OggStream.from(inputStream);
 
         assertNull(oggStream.readPage());
     }
@@ -98,13 +98,13 @@ class OggStreamTest {
         byte[] unCompletedPageData = {'O', 'g', 'g', 'S', 0, 1};
         OggPage expectedPage = createOggPage();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(Bytes.concat(unCompletedPageData, expectedPage.dump()));
-        OggStream oggStream = new OggStream(inputStream);
+        OggStream oggStream = OggStream.from(inputStream);
 
         assertOggPageEquals(expectedPage, oggStream.readPage());
     }
 
     private OggPage createOggPage() {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         oggPage.setVersion(0);
         oggPage.setFlag((byte) 0x00);
         oggPage.setGranulePosition(257);

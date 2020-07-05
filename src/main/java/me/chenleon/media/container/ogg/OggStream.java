@@ -2,7 +2,11 @@ package me.chenleon.media.container.ogg;
 
 import com.google.common.io.LittleEndianDataInputStream;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import static me.chenleon.media.container.ogg.OggPage.CAPTURE_PATTERN;
 import static me.chenleon.media.container.ogg.OggPage.MAX_LACE_VALUE;
@@ -10,22 +14,27 @@ import static me.chenleon.media.container.ogg.OggPage.MAX_LACE_VALUE;
 public class OggStream {
     private LittleEndianDataInputStream in;
 
+    private OggStream(InputStream inputStream) {
+        this.in = new LittleEndianDataInputStream(inputStream);
+    }
+
     /**
      * Create {@code OggStream} from a file
      *
      * @param filePath path of an Ogg file
      * @throws FileNotFoundException if the Ogg file doesn't exist
      */
-    public OggStream(String filePath) throws FileNotFoundException {
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filePath));
-        this.in = new LittleEndianDataInputStream(bufferedInputStream);
+    public static OggStream from(String filePath) throws FileNotFoundException {
+        return new OggStream(new BufferedInputStream(new FileInputStream(filePath)));
     }
 
     /**
+     * Create {@code OggStream} from an {@code InputStream}
+     *
      * @param inputStream the underlying input stream
      */
-    public OggStream(InputStream inputStream) {
-        this.in = new LittleEndianDataInputStream(inputStream);
+    public static OggStream from(InputStream inputStream) {
+        return new OggStream(inputStream);
     }
 
     /**
@@ -77,7 +86,7 @@ public class OggStream {
     }
 
     private OggPage nextPage() throws IOException {
-        OggPage oggPage = new OggPage();
+        OggPage oggPage = OggPage.empty();
         oggPage.setVersion(in.readUnsignedByte());
         oggPage.setFlag(in.readByte());
         oggPage.setGranulePosition(in.readLong());

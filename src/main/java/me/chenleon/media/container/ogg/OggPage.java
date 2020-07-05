@@ -22,6 +22,13 @@ public class OggPage {
     private byte[] laceValues = new byte[0];
     private final List<byte[]> dataPackets = new LinkedList<>();
 
+    private OggPage() {
+    }
+
+    public static OggPage empty() {
+        return new OggPage();
+    }
+
     public int getVersion() {
         return version;
     }
