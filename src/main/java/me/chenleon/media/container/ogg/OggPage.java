@@ -137,7 +137,7 @@ public class OggPage {
                 out.write(dataPacket);
             }
         } catch (IOException e) {
-            throw new DumpException("OggPage dump to byte array error", e);
+            throw new RuntimeException("OggPage dump to byte array error", e);
         }
         return byteArrayOutputStream.toByteArray();
     }

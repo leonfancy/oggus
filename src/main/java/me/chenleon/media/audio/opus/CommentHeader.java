@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
-import me.chenleon.media.container.ogg.DumpException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -121,7 +120,7 @@ public class CommentHeader {
                 out.write(commentString.getBytes(StandardCharsets.UTF_8));
             }
         } catch (IOException e) {
-            throw new DumpException("CommentHeader dump to byte array error", e);
+            throw new RuntimeException("CommentHeader dump to byte array error", e);
         }
 
         return byteArrayOutputStream.toByteArray();

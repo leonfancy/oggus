@@ -4,7 +4,6 @@ import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
 import lombok.Getter;
 import lombok.Setter;
-import me.chenleon.media.container.ogg.DumpException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -100,7 +99,7 @@ public class IdHeader {
                 }
             }
         } catch (IOException e) {
-            throw new DumpException("IdHeader dump to byte array error", e);
+            throw new RuntimeException("IdHeader dump to byte array error", e);
         }
 
         return byteArrayOutputStream.toByteArray();
