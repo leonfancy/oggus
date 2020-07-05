@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class OpusFileTest {
+class OggOpusStreamTest {
     @Test
     void should_read_valid_ogg_stream_with_one_audio_packet() throws IOException {
         IdHeader idHeader = createIdHeader();
@@ -40,19 +40,19 @@ class OpusFileTest {
 
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
 
-        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+        OggOpusStream oggOpusStream = OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
 
-        assertEquals("test vendor", opusFile.getVendor());
-        assertEquals(1, opusFile.getTags().size());
-        assertEquals("[Test title]", opusFile.getTags().get("TITLE").toString());
+        assertEquals("test vendor", oggOpusStream.getVendor());
+        assertEquals(1, oggOpusStream.getTags().size());
+        assertEquals("[Test title]", oggOpusStream.getTags().get("TITLE").toString());
 
-        IdHeader actualIdHeader = opusFile.getIdHeader();
+        IdHeader actualIdHeader = oggOpusStream.getIdHeader();
         assertArrayEquals(idHeader.dump(), actualIdHeader.dump());
 
-        AudioDataPacket audioDataPacket = opusFile.readAudioPacket();
+        AudioDataPacket audioDataPacket = oggOpusStream.readAudioPacket();
         assertOpusPacketEqual(opusPacket, audioDataPacket.getOpusPackets().get(0));
 
-        assertNull(opusFile.readAudioPacket());
+        assertNull(oggOpusStream.readAudioPacket());
     }
 
     @Test
@@ -61,7 +61,7 @@ class OpusFileTest {
         OggPage oggPage = createOggPage(0, 1, commentHeader.dump());
 
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
-            OpusFile.from(new ByteArrayInputStream(oggPage.dump()));
+            OggOpusStream.from(new ByteArrayInputStream(oggPage.dump()));
         });
 
         assertEquals("No ID Header data in this opus file", exception.getMessage());
@@ -74,7 +74,7 @@ class OpusFileTest {
         oggPage.setBOS();
 
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
-            OpusFile.from(new ByteArrayInputStream(oggPage.dump()));
+            OggOpusStream.from(new ByteArrayInputStream(oggPage.dump()));
         });
 
         assertEquals("The ID Header Ogg page must NOT contain other data", exception.getMessage());
@@ -97,11 +97,11 @@ class OpusFileTest {
         oggPage3.addDataPacket(Arrays.copyOfRange(commentData, 255 * 255, commentData.length));
 
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
-        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+        OggOpusStream oggOpusStream = OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
 
-        assertEquals("test vendor", opusFile.getVendor());
-        assertEquals(2, opusFile.getTags().size());
-        assertEquals(longTagValue, String.join("", opusFile.getTags().get("LONG_TITLE")));
+        assertEquals("test vendor", oggOpusStream.getVendor());
+        assertEquals(2, oggOpusStream.getTags().size());
+        assertEquals(longTagValue, String.join("", oggOpusStream.getTags().get("LONG_TITLE")));
     }
 
     @Test
@@ -116,7 +116,7 @@ class OpusFileTest {
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump());
 
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
-            OpusFile.from(new ByteArrayInputStream(oggStreamData));
+            OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
         });
 
         assertEquals("Comment Header Ogg pages must only contain 1 data packet", exception.getMessage());
@@ -138,12 +138,12 @@ class OpusFileTest {
 
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
 
-        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+        OggOpusStream oggOpusStream = OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
 
-        opusFile.readAudioPacket();
+        oggOpusStream.readAudioPacket();
 
         InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
-            opusFile.readAudioPacket();
+            oggOpusStream.readAudioPacket();
         });
 
         assertEquals("Corrupted opus binary data", exception.getMessage());
@@ -169,9 +169,9 @@ class OpusFileTest {
 
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump(), oggPage4.dump());
 
-        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+        OggOpusStream oggOpusStream = OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
 
-        AudioDataPacket audioDataPacket = opusFile.readAudioPacket();
+        AudioDataPacket audioDataPacket = oggOpusStream.readAudioPacket();
         assertEquals(1, audioDataPacket.getOpusPackets().size());
         assertOpusPacketEqual(opusPacket, audioDataPacket.getOpusPackets().get(0));
     }
@@ -200,18 +200,18 @@ class OpusFileTest {
 
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
 
-        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+        OggOpusStream oggOpusStream = OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
 
-        AudioDataPacket audioDataPacket1 = opusFile.readAudioPacket();
+        AudioDataPacket audioDataPacket1 = oggOpusStream.readAudioPacket();
         assertEquals(1, audioDataPacket1.getOpusPackets().size());
         assertOpusPacketEqual(opusPacket1, audioDataPacket1.getOpusPackets().get(0));
 
-        AudioDataPacket audioDataPacket2 = opusFile.readAudioPacket();
+        AudioDataPacket audioDataPacket2 = oggOpusStream.readAudioPacket();
         assertOpusPacketEqual(opusPacket2, audioDataPacket2.getOpusPackets().get(0));
 
-        opusFile.readAudioPacket();
+        oggOpusStream.readAudioPacket();
 
-        assertNull(opusFile.readAudioPacket());
+        assertNull(oggOpusStream.readAudioPacket());
     }
 
     @Test
@@ -243,16 +243,16 @@ class OpusFileTest {
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump(), oggPage4.dump(),
                 oggPage5.dump());
 
-        OpusFile opusFile = OpusFile.from(new ByteArrayInputStream(oggStreamData));
+        OggOpusStream oggOpusStream = OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
 
-        AudioDataPacket audioDataPacket1 = opusFile.readAudioPacket();
+        AudioDataPacket audioDataPacket1 = oggOpusStream.readAudioPacket();
         assertEquals(1, audioDataPacket1.getOpusPackets().size());
         assertOpusPacketEqual(opusPacket1, audioDataPacket1.getOpusPackets().get(0));
 
-        AudioDataPacket audioDataPacket2 = opusFile.readAudioPacket();
+        AudioDataPacket audioDataPacket2 = oggOpusStream.readAudioPacket();
         assertOpusPacketEqual(opusPacket2, audioDataPacket2.getOpusPackets().get(0));
 
-        assertNull(opusFile.readAudioPacket());
+        assertNull(oggOpusStream.readAudioPacket());
     }
 
     private CommentHeader createCommentHeader() {
@@ -293,8 +293,8 @@ class OpusFileTest {
     @Test
     @Disabled
     void should_read_ogg_stream() throws IOException {
-        OpusFile opusFile = new OpusFile(new OggStream("audio/technology.opus"));
-        IdHeader idHeader = opusFile.getIdHeader();
+        OggOpusStream oggOpusStream = new OggOpusStream(new OggStream("audio/technology.opus"));
+        IdHeader idHeader = oggOpusStream.getIdHeader();
 
         System.out.printf("Version: %d.%d\n", idHeader.getMajorVersion(), idHeader.getMinorVersion());
         System.out.printf("Channel Count: %d\n", idHeader.getChannelCount());
@@ -306,17 +306,17 @@ class OpusFileTest {
         System.out.printf("Coupled Stream Count: %d\n", idHeader.getCoupledCount());
         System.out.printf("Channel Mapping: %s\n", Ints.join(" ", idHeader.getChannelMapping()));
 
-        System.out.printf("Vendor: %s\n", opusFile.getVendor());
+        System.out.printf("Vendor: %s\n", oggOpusStream.getVendor());
 
         System.out.println("Tags: ");
-        Map<String, Collection<String>> tags = opusFile.getTags();
+        Map<String, Collection<String>> tags = oggOpusStream.getTags();
         for (String key : tags.keySet()) {
             System.out.printf("- %s=%s\n", key, tags.get(key).stream().collect(Collectors.joining(",")));
         }
 
         int count = 1;
         while (true) {
-            AudioDataPacket audioDataPacket = opusFile.readAudioPacket();
+            AudioDataPacket audioDataPacket = oggOpusStream.readAudioPacket();
             if (audioDataPacket == null) {
                 break;
             }

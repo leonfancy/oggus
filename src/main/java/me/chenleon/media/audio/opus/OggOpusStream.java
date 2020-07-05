@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-public class OpusFile {
+public class OggOpusStream {
     private final CommentHeader commentHeader;
     private final IdHeader idHeader;
     private final OggStream oggStream;
@@ -21,18 +21,18 @@ public class OpusFile {
     private long streamId;
     private boolean isEnd = false;
 
-    public OpusFile(OggStream oggStream) throws IOException {
+    public OggOpusStream(OggStream oggStream) throws IOException {
         idHeader = readIdHeader(oggStream);
         commentHeader = readCommentHeader(oggStream);
         this.oggStream = oggStream;
     }
 
-    public static OpusFile from(InputStream inputStream) throws IOException {
-        return new OpusFile(new OggStream(inputStream));
+    public static OggOpusStream from(InputStream inputStream) throws IOException {
+        return new OggOpusStream(new OggStream(inputStream));
     }
 
-    public static OpusFile from(String filename) throws IOException {
-        return new OpusFile(new OggStream(filename));
+    public static OggOpusStream from(String filename) throws IOException {
+        return new OggOpusStream(new OggStream(filename));
     }
 
     private IdHeader readIdHeader(OggStream oggStream) throws IOException {

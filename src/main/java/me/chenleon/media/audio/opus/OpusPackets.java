@@ -10,9 +10,9 @@ public class OpusPackets {
      * Create a {@code OpusPacket} with given {@code config}, {@code channel} and {@code code}, see
      * <a href=https://tools.ietf.org/html/rfc6716#section-3.2>RFC6716 Section-3.2</a>.
      *
-     * @param config the config from 0 ~ 31
+     * @param config  the config from 0 ~ 31
      * @param channel stereo or mono
-     * @param code the Opus packet code
+     * @param code    the Opus packet code
      * @return the OpusPacket object
      */
     public static OpusPacket newPacket(Config config, Channel channel, int code) {

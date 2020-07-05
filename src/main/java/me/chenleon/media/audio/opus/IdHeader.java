@@ -2,8 +2,6 @@ package me.chenleon.media.audio.opus;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,8 +10,6 @@ import java.util.Arrays;
 
 import static java.lang.String.format;
 
-@Setter
-@Getter
 public class IdHeader {
     public static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd'};
     private int majorVersion;
@@ -103,5 +99,85 @@ public class IdHeader {
         }
 
         return byteArrayOutputStream.toByteArray();
+    }
+
+    public int getMajorVersion() {
+        return majorVersion;
+    }
+
+    public void setMajorVersion(int majorVersion) {
+        this.majorVersion = majorVersion;
+    }
+
+    public int getMinorVersion() {
+        return minorVersion;
+    }
+
+    public void setMinorVersion(int minorVersion) {
+        this.minorVersion = minorVersion;
+    }
+
+    public int getChannelCount() {
+        return channelCount;
+    }
+
+    public void setChannelCount(int channelCount) {
+        this.channelCount = channelCount;
+    }
+
+    public int getPreSkip() {
+        return preSkip;
+    }
+
+    public void setPreSkip(int preSkip) {
+        this.preSkip = preSkip;
+    }
+
+    public double getOutputGain() {
+        return outputGain;
+    }
+
+    public void setOutputGain(double outputGain) {
+        this.outputGain = outputGain;
+    }
+
+    public int getCoupledCount() {
+        return coupledCount;
+    }
+
+    public void setCoupledCount(int coupledCount) {
+        this.coupledCount = coupledCount;
+    }
+
+    public long getInputSampleRate() {
+        return inputSampleRate;
+    }
+
+    public void setInputSampleRate(long inputSampleRate) {
+        this.inputSampleRate = inputSampleRate;
+    }
+
+    public int getChannelMappingFamily() {
+        return channelMappingFamily;
+    }
+
+    public void setChannelMappingFamily(int channelMappingFamily) {
+        this.channelMappingFamily = channelMappingFamily;
+    }
+
+    public int getStreamCount() {
+        return streamCount;
+    }
+
+    public void setStreamCount(int streamCount) {
+        this.streamCount = streamCount;
+    }
+
+    public int[] getChannelMapping() {
+        return channelMapping;
+    }
+
+    public void setChannelMapping(int[] channelMapping) {
+        this.channelMapping = channelMapping;
     }
 }

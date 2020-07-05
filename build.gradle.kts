@@ -1,6 +1,5 @@
 plugins {
     `java-library`
-    id("io.freefair.lombok") version "5.1.0"
 }
 
 java {
@@ -35,8 +34,7 @@ tasks {
     jar {
         manifest {
             attributes(
-                    mapOf("Implementation-Title" to project.name,
-                            "Implementation-Version" to project.version)
+                    mapOf("Implementation-Title" to project.name, "Implementation-Version" to project.version)
             )
         }
     }

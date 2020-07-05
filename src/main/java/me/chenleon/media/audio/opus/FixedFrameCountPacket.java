@@ -2,7 +2,7 @@ package me.chenleon.media.audio.opus;
 
 import java.io.ByteArrayOutputStream;
 
-public abstract class FixedFrameCountPacket extends OpusPacket {
+abstract class FixedFrameCountPacket extends OpusPacket {
     public void setVbr(boolean isVbr) {
         throw new IllegalStateException("Code 0 to 2 Opus packet doesn't support setting Vbr flag");
     }
