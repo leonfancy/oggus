@@ -1,6 +1,6 @@
 # Oggus
 
-Oggus is a Java library for reading and writing Ogg Opus stream. Opus packet structure is supported, but encoding/decoding Opus frame is not supported.
+Oggus is a Java library for reading and writing Ogg Opus stream. Opus packet structure is supported.
 
 ## Introduction 
 
@@ -169,7 +169,7 @@ outputStream.write(binary);
 
 ### Write Ogg Opus stream
 
-Create Ogg Opus stream is much the same simple Ogg stream described above, except that the data packet in OggPage is dumped from AudioDataPacket object.
+Create Ogg Opus stream is much the same as simple Ogg stream described above, except that the data packet in OggPage is dumped from AudioDataPacket object.
 
 ```java
 // Create an AudioDataPacket which contains 2 Opus packets, that means this is multi-channel stream
