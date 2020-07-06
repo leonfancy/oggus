@@ -8,7 +8,7 @@ java {
 }
 
 version = "0.1.0"
-group = "me.chenleon.media.audio"
+group = "me.chenleon.oggus"
 
 repositories {
     jcenter()

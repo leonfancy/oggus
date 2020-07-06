@@ -6,10 +6,8 @@ import me.chenleon.media.container.ogg.OggStream;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
 public class OggOpusStream {
@@ -21,7 +19,7 @@ public class OggOpusStream {
     private long streamId;
     private boolean isEnd = false;
 
-    public OggOpusStream(OggStream oggStream) throws IOException {
+    private OggOpusStream(OggStream oggStream) throws IOException {
         idHeader = readIdHeader(oggStream);
         commentHeader = readCommentHeader(oggStream);
         this.oggStream = oggStream;
@@ -75,12 +73,8 @@ public class OggOpusStream {
         return this.idHeader;
     }
 
-    public String getVendor() {
-        return commentHeader.getVendor();
-    }
-
-    public Map<String, Collection<String>> getTags() {
-        return commentHeader.getTags();
+    public CommentHeader getCommentHeader() {
+        return this.commentHeader;
     }
 
     public AudioDataPacket readAudioPacket() throws IOException {

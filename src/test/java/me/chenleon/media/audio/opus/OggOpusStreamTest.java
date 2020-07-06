@@ -42,9 +42,11 @@ class OggOpusStreamTest {
 
         OggOpusStream oggOpusStream = OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
 
-        assertEquals("test vendor", oggOpusStream.getVendor());
-        assertEquals(1, oggOpusStream.getTags().size());
-        assertEquals("[Test title]", oggOpusStream.getTags().get("TITLE").toString());
+        CommentHeader actualCommentHeader = oggOpusStream.getCommentHeader();
+
+        assertEquals("test vendor", actualCommentHeader.getVendor());
+        assertEquals(1, actualCommentHeader.getTags().size());
+        assertEquals("[Test title]", actualCommentHeader.getTags().get("TITLE").toString());
 
         IdHeader actualIdHeader = oggOpusStream.getIdHeader();
         assertArrayEquals(idHeader.dump(), actualIdHeader.dump());
@@ -99,9 +101,11 @@ class OggOpusStreamTest {
         byte[] oggStreamData = Bytes.concat(oggPage1.dump(), oggPage2.dump(), oggPage3.dump());
         OggOpusStream oggOpusStream = OggOpusStream.from(new ByteArrayInputStream(oggStreamData));
 
-        assertEquals("test vendor", oggOpusStream.getVendor());
-        assertEquals(2, oggOpusStream.getTags().size());
-        assertEquals(longTagValue, String.join("", oggOpusStream.getTags().get("LONG_TITLE")));
+        CommentHeader actualCommentHeader = oggOpusStream.getCommentHeader();
+
+        assertEquals("test vendor", actualCommentHeader.getVendor());
+        assertEquals(2, actualCommentHeader.getTags().size());
+        assertEquals(longTagValue, String.join("", actualCommentHeader.getTags().get("LONG_TITLE")));
     }
 
     @Test
@@ -293,7 +297,7 @@ class OggOpusStreamTest {
     @Test
     @Disabled
     void should_read_ogg_stream() throws IOException {
-        OggOpusStream oggOpusStream = new OggOpusStream(OggStream.from("audio/technology.opus"));
+        OggOpusStream oggOpusStream = OggOpusStream.from("audio/technology.opus");
         IdHeader idHeader = oggOpusStream.getIdHeader();
 
         System.out.printf("Version: %d.%d\n", idHeader.getMajorVersion(), idHeader.getMinorVersion());
@@ -306,10 +310,10 @@ class OggOpusStreamTest {
         System.out.printf("Coupled Stream Count: %d\n", idHeader.getCoupledCount());
         System.out.printf("Channel Mapping: %s\n", Ints.join(" ", idHeader.getChannelMapping()));
 
-        System.out.printf("Vendor: %s\n", oggOpusStream.getVendor());
+        System.out.printf("Vendor: %s\n", oggOpusStream.getCommentHeader().getVendor());
 
         System.out.println("Tags: ");
-        Map<String, Collection<String>> tags = oggOpusStream.getTags();
+        Map<String, Collection<String>> tags = oggOpusStream.getCommentHeader().getTags();
         for (String key : tags.keySet()) {
             System.out.printf("- %s=%s\n", key, tags.get(key).stream().collect(Collectors.joining(",")));
         }
