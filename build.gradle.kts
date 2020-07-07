@@ -1,10 +1,14 @@
 plugins {
     `java-library`
+    `maven-publish`
+    signing
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
+    withJavadocJar()
+    withSourcesJar()
 }
 
 version = "0.1.0"
@@ -40,3 +44,41 @@ tasks {
     }
 }
 
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            pom {
+                name.set("Oggus")
+                description.set("Oggus is a Java library for reading and writing Ogg and Opus stream. Opus packet structure is supported.")
+                url.set("https://github.com/leonfancy/oggus")
+                licenses {
+                    license {
+                        name.set("WTFPL")
+                        url.set("https://github.com/leonfancy/oggus/blob/master/LICENSE")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("slimhigh")
+                        name.set("Liang Chen")
+                        email.set("slimhigh@gmail.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:https://github.com/leonfancy/oggus.git")
+                    developerConnection.set("scm:git:https://github.com/leonfancy/oggus.git")
+                    url.set("https://github.com/leonfancy/oggus")
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = uri("$buildDir/repos/releases")
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications["mavenJava"])
+}
