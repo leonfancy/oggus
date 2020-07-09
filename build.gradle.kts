@@ -12,7 +12,7 @@ java {
 }
 
 version = "0.1.0"
-group = "me.chenleon.oggus"
+group = "org.chenliang.oggus"
 
 repositories {
     jcenter()
