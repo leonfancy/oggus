@@ -11,7 +11,7 @@ java {
     withSourcesJar()
 }
 
-version = "0.1.0"
+version = "0.2.0"
 group = "org.chenliang.oggus"
 
 repositories {
@@ -47,6 +47,7 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("oggus") {
+            from(components["java"])
             pom {
                 name.set("Oggus")
                 description.set("Oggus is a Java library for reading and writing Ogg and Opus stream. Opus packet structure is supported.")
