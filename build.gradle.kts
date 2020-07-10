@@ -46,7 +46,7 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
+        create<MavenPublication>("oggus") {
             pom {
                 name.set("Oggus")
                 description.set("Oggus is a Java library for reading and writing Ogg and Opus stream. Opus packet structure is supported.")
@@ -74,11 +74,19 @@ publishing {
     }
     repositories {
         maven {
-            url = uri("$buildDir/repos/releases")
+            name = "OSSRH"
+            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials  {
+                username = System.getenv("SONATYPE_USER")
+                password = System.getenv("SONATYPE_PWD")
+            }
         }
     }
 }
 
 signing {
-    sign(publishing.publications["mavenJava"])
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign(publishing.publications["oggus"])
 }
