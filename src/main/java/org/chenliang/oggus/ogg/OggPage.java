@@ -2,7 +2,6 @@ package org.chenliang.oggus.ogg;
 
 import com.google.common.io.LittleEndianDataOutputStream;
 import com.google.common.primitives.Bytes;
-import org.chenliang.oggus.opus.InvalidOpusException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

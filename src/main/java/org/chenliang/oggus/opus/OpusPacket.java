@@ -123,11 +123,15 @@ public abstract class OpusPacket {
 
     /**
      * Dump Opus packet to standard binary.
+     *
+     * @return binary byte array
      */
     public abstract byte[] dumpToStandardFormat();
 
     /**
      * Dump Opus packet to self delimiting binary.
+     *
+     * @return binary byte array
      */
     public abstract byte[] dumpToSelfDelimitingFormat();
 

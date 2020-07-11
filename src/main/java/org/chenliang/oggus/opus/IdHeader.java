@@ -10,6 +10,28 @@ import java.util.Arrays;
 
 import static java.lang.String.format;
 
+/**
+ * The Identification Header packet of a Ogg Opus stream. It has following structure:
+ *
+ * <pre>
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      'O'      |      'p'      |      'u'      |      's'      |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      'H'      |      'e'      |      'a'      |      'd'      |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |  Version = 1  | Channel Count |           Pre-skip            |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                     Input Sample Rate (Hz)                    |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |   Output Gain (Q7.8 in dB)    | Mapping Family|               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               :
+ * |                                                               |
+ * :               Optional Channel Mapping Table...               :
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * </pre>
+ */
 public class IdHeader {
     public static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd'};
     private int majorVersion;
@@ -26,6 +48,12 @@ public class IdHeader {
     private IdHeader() {
     }
 
+    /**
+     * Parse {@code IdHeader} from binary data, the data must start with 'OpusHead'.
+     *
+     * @param data the binary data of ID Header
+     * @return IdHeader
+     */
     public static IdHeader from(byte[] data) {
         IdHeader idHeader = new IdHeader();
         LittleEndianDataInputStream in = new LittleEndianDataInputStream(new ByteArrayInputStream(data));
@@ -70,10 +98,20 @@ public class IdHeader {
         }
     }
 
+    /**
+     * Create an empty Id Header.
+     *
+     * @return IdHeader
+     */
     public static IdHeader emptyHeader() {
         return new IdHeader();
     }
 
+    /**
+     * Dump this IdHeader to binary.
+     *
+     * @return the binary bytes representation of this IdHeader
+     */
     public byte[] dump() {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         LittleEndianDataOutputStream out = new LittleEndianDataOutputStream(byteArrayOutputStream);

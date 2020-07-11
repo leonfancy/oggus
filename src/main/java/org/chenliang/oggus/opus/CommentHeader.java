@@ -13,6 +13,34 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * The Comment Header packet of a Ogg Opus stream. It has following structure:
+ * <pre>
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      'O'      |      'p'      |      'u'      |      's'      |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      'T'      |      'a'      |      'g'      |      's'      |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                     Vendor String Length                      |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * :                        Vendor String...                       :
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                   User Comment List Length                    |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                 User Comment #0 String Length                 |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * :                   User Comment #0 String...                   :
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                 User Comment #1 String Length                 |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * :                                                               :
+ * </pre>
+ */
 public class CommentHeader {
     public static final byte[] MAGIC_SIGNATURE = {'O', 'p', 'u', 's', 'T', 'a', 'g', 's'};
     private String vendor;
@@ -22,7 +50,7 @@ public class CommentHeader {
     }
 
     /**
-     * Create {@code CommentHeader} from binary data, the data must start with 'OpusTags'.
+     * Parse {@code CommentHeader} from binary data, the data must start with 'OpusTags'.
      * <p>
      * Based on the specification, tag fields are case-insensitive. They are all converted to upper case when parsing
      * from the binary data.
@@ -58,6 +86,8 @@ public class CommentHeader {
 
     /**
      * Create an empty Comment Header.
+     *
+     * @return CommentHeader
      */
     public static CommentHeader emptyHeader() {
         return new CommentHeader();
@@ -84,6 +114,8 @@ public class CommentHeader {
 
     /**
      * Set Vendor
+     *
+     * @param vendor the Vendor string
      */
     public void setVendor(String vendor) {
         this.vendor = vendor;
@@ -91,6 +123,9 @@ public class CommentHeader {
 
     /**
      * Add a tag, the key will be transformed to upper case.
+     *
+     * @param key   tag name
+     * @param value tag value
      */
     public void addTag(String key, String value) {
         this.tags.put(key.toUpperCase(), value);

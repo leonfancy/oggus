@@ -24,6 +24,7 @@ public class OggStream {
      *
      * @param filePath path of an Ogg file
      * @throws FileNotFoundException if the Ogg file doesn't exist.
+     * @return OggStream
      */
     public static OggStream from(String filePath) throws FileNotFoundException {
         return new OggStream(new BufferedInputStream(new FileInputStream(filePath)));
@@ -33,6 +34,7 @@ public class OggStream {
      * Create {@code OggStream} from an {@code InputStream}.
      *
      * @param inputStream the underlying input stream.
+     * @return OggStream
      */
     public static OggStream from(InputStream inputStream) {
         return new OggStream(inputStream);
