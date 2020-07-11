@@ -20,7 +20,7 @@ public class OggPage {
     public static final byte[] CAPTURE_PATTERN = {'O', 'g', 'g', 'S'};
     public static final int MAX_LACE_VALUE = 255;
     private int version = 0;
-    private byte flag = 0x00;
+    private int flag = 0x00;
     private long granulePosition;
     private long serialNum;
     private long seqNum;
@@ -47,32 +47,62 @@ public class OggPage {
         return version;
     }
 
-    public void setFlag(byte flag) {
-        this.flag = flag;
+    /**
+     * Set the flag byte. The flags should also be individually set with methods: {@link OggPage#setContinued()},
+     * {@link OggPage#setBOS()}, {@link OggPage#setBOS()}.
+     *
+     * @param flag the flag byte value, only last three bits is used.
+     */
+    public void setFlag(int flag) {
+        this.flag = flag & 0x07;
     }
 
+    /**
+     * Check whether the "continued" bit of flag byte is set.
+     *
+     * @return true if this Ogg is continued with last Ogg page.
+     */
     public boolean isContinued() {
         return (this.flag & 0x01) != 0;
     }
 
+    /**
+     * Set the "continued" bit of flag byte.
+     */
     public void setContinued() {
-        flag = (byte) (flag | 0x01);
+        flag = flag | 0x01;
     }
 
+    /**
+     * Check whether the "BOS" bit of flag byte is set.
+     *
+     * @return true if this page is the begging of a logical ogg stream.
+     */
     public boolean isBOS() {
         return (this.flag & 0x02) != 0;
     }
 
+    /**
+     * Set the "BOS" bit of flag byte.
+     */
     public void setBOS() {
-        flag = (byte) (flag | 0x02);
+        flag = flag | 0x02;
     }
 
+    /**
+     * Check whether the "EOS" bit of flag byte is set.
+     *
+     * @return true if this page is the end of a logical ogg stream.
+     */
     public boolean isEOS() {
         return (this.flag & 0x04) != 0;
     }
 
+    /**
+     * Set the "EOS" bit of flag byte.
+     */
     public void setEOS() {
-        flag = (byte) (flag | 0x04);
+        flag = flag | 0x04;
     }
 
     public long getGranulePosition() {

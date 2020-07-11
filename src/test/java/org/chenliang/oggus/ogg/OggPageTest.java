@@ -16,39 +16,39 @@ class OggPageTest {
     void should_correctly_parse_flag() {
         OggPage oggPage = OggPage.empty();
 
-        oggPage.setFlag((byte) 0x00);
+        oggPage.setFlag(0x00);
         assertFalse(oggPage.isContinued());
         assertFalse(oggPage.isBOS());
         assertFalse(oggPage.isEOS());
 
-        oggPage.setFlag((byte) 0x01);
+        oggPage.setFlag(0x01);
         assertTrue(oggPage.isContinued());
 
-        oggPage.setFlag((byte) 0x02);
+        oggPage.setFlag(0x02);
         assertTrue(oggPage.isBOS());
 
-        oggPage.setFlag((byte) 0x04);
+        oggPage.setFlag(0x04);
         assertTrue(oggPage.isEOS());
     }
 
     @Test
     void should_correctly_set_flag() {
         OggPage oggPage = OggPage.empty();
-        oggPage.setFlag((byte) 0x00);
+        oggPage.setFlag(0x00);
 
         oggPage.setContinued();
         assertTrue(oggPage.isContinued());
         assertFalse(oggPage.isBOS());
         assertFalse(oggPage.isEOS());
 
-        oggPage.setFlag((byte) 0x00);
+        oggPage.setFlag(0x00);
 
         oggPage.setBOS();
         assertFalse(oggPage.isContinued());
         assertTrue(oggPage.isBOS());
         assertFalse(oggPage.isEOS());
 
-        oggPage.setFlag((byte) 0x00);
+        oggPage.setFlag(0x00);
 
         oggPage.setEOS();
         assertFalse(oggPage.isContinued());
@@ -71,7 +71,7 @@ class OggPageTest {
     @Test
     void should_dump_ogg_page_to_byte_array() {
         OggPage oggPage = OggPage.empty();
-        oggPage.setFlag((byte) 0x01);
+        oggPage.setFlag(0x01);
         oggPage.setGranulePosition(257);
         oggPage.setSerialNum(0xffffffff);
         oggPage.setSeqNum(1025);

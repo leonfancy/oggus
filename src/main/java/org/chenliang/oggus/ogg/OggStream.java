@@ -88,7 +88,7 @@ public class OggStream {
         if (version != 0) {
             throw new InvalidOggException("Unsupported Ogg page version: " + version);
         }
-        oggPage.setFlag(in.readByte());
+        oggPage.setFlag(in.readUnsignedByte());
         oggPage.setGranulePosition(in.readLong());
         oggPage.setSerialNum(Integer.toUnsignedLong(in.readInt()));
         oggPage.setSeqNum(Integer.toUnsignedLong(in.readInt()));
