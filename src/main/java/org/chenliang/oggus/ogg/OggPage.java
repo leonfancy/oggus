@@ -13,6 +13,28 @@ import java.util.List;
 /**
  * Ogg page that defined by <a href="https://tools.ietf.org/html/rfc3533">RFC3533</a>.
  *
+ * <p>Following is the field layout of an Ogg page header:</p>
+ * <pre>
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1| Byte
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | capture_pattern: Magic number for page start "OggS"           | 0-3
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | version       | header_type   | granule_position              | 4-7
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               | 8-11
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                               | bitstream_serial_number       | 12-15
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                               | page_sequence_number          | 16-19
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                               | CRC_checksum                  | 20-23
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                               |page_segments  | segment_table | 24-27
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | ...                                                           | 28-
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * </pre>
+ *
  * <p>Create a new OggPage object with static method: {@link OggPage#empty()}. Call set...() methods to set fields of
  * Ogg page.
  */
@@ -145,18 +167,36 @@ public class OggPage {
         return laceValues;
     }
 
+    /**
+     * Check whether the last page is completed in this page.
+     *
+     * @return true if the last data packet is completed in this page.
+     */
     public boolean isCompleted() {
         return Byte.toUnsignedInt(laceValues[getSegCount() - 1]) < MAX_LACE_VALUE;
     }
 
+    /**
+     * Add a data packet to this page. The lace values of this data packet are automatically generated.
+     *
+     * @param data the binary byte array of a data packet.
+     */
     public void addDataPacket(byte[] data) {
         laceValues = Bytes.concat(laceValues, lenToLaceValues(data.length, false));
         dataPackets.add(data);
     }
 
+    /**
+     * Add a partial data packet to this page. The lace values of this data packet are automatically generated.
+     *
+     * <p>Partial data packet means the remaining parts are stored in following Ogg pages. The length of partial
+     * data packet must be a multiple of 255</p>
+     *
+     * @param data the binary byte array of a data packet.
+     */
     public void addPartialDataPacket(byte[] data) {
         if (data.length % 255 != 0) {
-            throw new InvalidOpusException("Not a partial data packet");
+            throw new InvalidOggException("Not a partial data packet");
         }
         laceValues = Bytes.concat(laceValues, lenToLaceValues(data.length, true));
         dataPackets.add(data);
@@ -166,6 +206,11 @@ public class OggPage {
         return dataPackets;
     }
 
+    /**
+     * Dump the Ogg page to binary. This method could be used to create a binary Ogg stream.
+     *
+     * @return the dumped binary byte array
+     */
     public byte[] dump() {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         LittleEndianDataOutputStream out = new LittleEndianDataOutputStream(byteArrayOutputStream);

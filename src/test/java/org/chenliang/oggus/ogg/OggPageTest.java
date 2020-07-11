@@ -123,7 +123,7 @@ class OggPageTest {
     @Test
     void should_throw_exception_when_adding_partial_data_packet_and_the_length_is_not_multiple_of_255() {
         OggPage oggPage = OggPage.empty();
-        InvalidOpusException exception = assertThrows(InvalidOpusException.class, () -> {
+        InvalidOggException exception = assertThrows(InvalidOggException.class, () -> {
             oggPage.addPartialDataPacket(TestUtil.createBinary(511, (byte) 1));
         });
 
