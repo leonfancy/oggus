@@ -8,6 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * An Ogg stream is made up of a sequence of Ogg pages. An Ogg stream stream could be multiplexed by several logical
+ * Ogg stream which could be identified with the {@code serialNum}.
+ */
 public class OggStream {
     private LittleEndianDataInputStream in;
 
@@ -16,19 +20,19 @@ public class OggStream {
     }
 
     /**
-     * Create {@code OggStream} from a file
+     * Create {@code OggStream} from a file.
      *
      * @param filePath path of an Ogg file
-     * @throws FileNotFoundException if the Ogg file doesn't exist
+     * @throws FileNotFoundException if the Ogg file doesn't exist.
      */
     public static OggStream from(String filePath) throws FileNotFoundException {
         return new OggStream(new BufferedInputStream(new FileInputStream(filePath)));
     }
 
     /**
-     * Create {@code OggStream} from an {@code InputStream}
+     * Create {@code OggStream} from an {@code InputStream}.
      *
-     * @param inputStream the underlying input stream
+     * @param inputStream the underlying input stream.
      */
     public static OggStream from(InputStream inputStream) {
         return new OggStream(inputStream);
