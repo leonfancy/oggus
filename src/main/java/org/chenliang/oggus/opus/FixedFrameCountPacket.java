@@ -2,6 +2,10 @@ package org.chenliang.oggus.opus;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * This is the parent class of {@link CodeZeroPacket}, {@link CodeOnePacket} and {@link CodeTwoPacket}.
+ * These Opus packets contains a fixed number of frames.
+ */
 abstract class FixedFrameCountPacket extends OpusPacket {
     public void setVbr(boolean isVbr) {
         throw new IllegalStateException("Code 0 to 2 Opus packet doesn't support setting Vbr flag");

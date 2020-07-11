@@ -9,6 +9,36 @@ import static org.chenliang.oggus.opus.Config.EncodeMode.CELT;
 import static org.chenliang.oggus.opus.Config.EncodeMode.HYBRID;
 import static org.chenliang.oggus.opus.Config.EncodeMode.SILK;
 
+/**
+ * Get the configuration of Opus packet that represent the encoding mode, bandwidth, and frame size. The first 5 bits
+ * of the TOC byte gives the ID of configuration. {@code Config.of(int id)} method is used to get the Config instance
+ * of a given ID.
+ *
+ * <p>Below are the table of configurations:
+ * <pre>
+ *    +-----------------------+-----------+-----------+-------------------+
+ *    | Configuration  ID     | Mode      | Bandwidth | Frame Sizes       |
+ *    +-----------------------+-----------+-----------+-------------------+
+ *    | 0...3                 | SILK-only | NB        | 10, 20, 40, 60 ms |
+ *    |                       |           |           |                   |
+ *    | 4...7                 | SILK-only | MB        | 10, 20, 40, 60 ms |
+ *    |                       |           |           |                   |
+ *    | 8...11                | SILK-only | WB        | 10, 20, 40, 60 ms |
+ *    |                       |           |           |                   |
+ *    | 12...13               | Hybrid    | SWB       | 10, 20 ms         |
+ *    |                       |           |           |                   |
+ *    | 14...15               | Hybrid    | FB        | 10, 20 ms         |
+ *    |                       |           |           |                   |
+ *    | 16...19               | CELT-only | NB        | 2.5, 5, 10, 20 ms |
+ *    |                       |           |           |                   |
+ *    | 20...23               | CELT-only | WB        | 2.5, 5, 10, 20 ms |
+ *    |                       |           |           |                   |
+ *    | 24...27               | CELT-only | SWB       | 2.5, 5, 10, 20 ms |
+ *    |                       |           |           |                   |
+ *    | 28...31               | CELT-only | FB        | 2.5, 5, 10, 20 ms |
+ *    +-----------------------+-----------+-----------+-------------------+
+ * </pre>
+ */
 public class Config {
     private final int id;
     private final EncodeMode encodeMode;
@@ -57,6 +87,10 @@ public class Config {
             new Config(31, CELT, FB, 20),
     };
 
+    /**
+     * @param id configuration id, should be between [0, 32)
+     * @return Config object
+     */
     public static Config of(int id) {
         if (id > 32 || id < 0) {
             throw new IllegalArgumentException("Invalid Config ID: " + id);
@@ -87,10 +121,16 @@ public class Config {
         return id;
     }
 
+    /**
+     * Opus encoding mode.
+     */
     public enum EncodeMode {
         SILK, HYBRID, CELT
     }
 
+    /**
+     * Opus supported audio bandwidth and sample rate.
+     */
     public enum Bandwidth {
         NB(4000, 8000), MB(6000, 12000), WB(8000, 16000),
         SWB(12000, 24000), FB(20000, 48000);
@@ -103,10 +143,16 @@ public class Config {
             this.sampleRate = sampleRate;
         }
 
+        /**
+         * @return audio bandwidth
+         */
         public int getHz() {
             return hz;
         }
 
+        /**
+         * @return sample rate for that bandwidth
+         */
         public int getSampleRate() {
             return sampleRate;
         }

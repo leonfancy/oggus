@@ -4,7 +4,27 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * An Opus packet that described in <a href=https://tools.ietf.org/html/rfc6716>RFC6716</a>.
+ * An Opus packet that described in <a href=https://tools.ietf.org/html/rfc6716>RFC6716</a>. An Opus packet binary
+ * always begins with a TOC byte as follows:
+ *
+ * <pre>
+ *  0 1 2 3 4 5 6 7
+ * +-+-+-+-+-+-+-+-+
+ * | config  |s| c |
+ * +-+-+-+-+-+-+-+-+
+ * </pre>
+ * <p>
+ * This Class is the abstract class to represent a Opus packet. Based on the frame count defined in the TOC byte,
+ * 4 concrete classes are defined:
+ * <ul>
+ *   <li>{@link CodeZeroPacket}</li>
+ *   <li>{@link CodeOnePacket}</li>
+ *   <li>{@link CodeTwoPacket}</li>
+ *   <li>{@link CodeThreePacket}</li>
+ * </ul>
+ * <p>
+ * Users don't care these concrete classes, they just use {@link OpusPackets} factory methods to create OpusPacket
+ * objects.
  */
 public abstract class OpusPacket {
     protected Config config;
@@ -12,7 +32,10 @@ public abstract class OpusPacket {
     protected final List<byte[]> frames = new LinkedList<>();
 
     /**
-     * Add one frame to this Opus packet.
+     * Add a frame to this Opus packet.
+     *
+     * <p>It will throw exception if the number of frames is over the allowed frame count, or a different length of
+     * frameData is added to a CBR Opus packet.</p>
      *
      * @param frameData the binary data byte array of a frame
      */
@@ -61,25 +84,42 @@ public abstract class OpusPacket {
      */
     public abstract int getCode();
 
-    public abstract boolean isVbr();
-
-    public abstract boolean hasPadding();
-
+    /**
+     * @return the allowed frame count in this Opus packet
+     */
     public abstract int getFrameCount();
-
-    public abstract int getPadLenBytesSum();
-
-    public int getPadDataLen() {
-        return (getPadLenBytesSum() / 255) * 254 + getPadLenBytesSum() % 255;
-    }
-
-    public abstract void setVbr(boolean isVbr);
-
-    public abstract void setHasPadding(boolean hasPadding);
 
     public abstract void setFrameCount(int frameCount);
 
+    /**
+     * @return {@code true} if this packet is variable bitrate
+     */
+    public abstract boolean isVbr();
+
+    public abstract void setVbr(boolean isVbr);
+
+    /**
+     * Only {@link CodeThreePacket} may have padding.
+     *
+     * @return {@code true} if packet has padding
+     */
+    public abstract boolean hasPadding();
+
+    public abstract void setHasPadding(boolean hasPadding);
+
+    public abstract int getPadLenBytesSum();
+
+    /**
+     * @param padLenBytesSum the sum of bytes that represent the padding length
+     */
     public abstract void setPadLenBytesSum(int padLenBytesSum);
+
+    /**
+     * @return the length of binary bytes that are padded at the last of this Opus packet
+     */
+    public int getPadDataLen() {
+        return (getPadLenBytesSum() / 255) * 254 + getPadLenBytesSum() % 255;
+    }
 
     /**
      * Dump Opus packet to standard binary.
@@ -87,7 +127,7 @@ public abstract class OpusPacket {
     public abstract byte[] dumpToStandardFormat();
 
     /**
-     * Dump Opus packet to self delimited binary.
+     * Dump Opus packet to self delimiting binary.
      */
     public abstract byte[] dumpToSelfDelimitingFormat();
 

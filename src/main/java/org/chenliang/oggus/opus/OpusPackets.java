@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Factory methods for creating {@link OpusPacket}, or parsing {@link OpusPacket} from binary data.
+ */
 public class OpusPackets {
     /**
-     * Create a {@code OpusPacket} with given {@code config}, {@code channel} and {@code code}, see
+     * Create an empty {@code OpusPacket} with given {@code config}, {@code channel} and {@code code}, see
      * <a href=https://tools.ietf.org/html/rfc6716#section-3.2>RFC6716 Section-3.2</a>.
      *
      * @param config  the config from 0 ~ 31
@@ -23,9 +26,10 @@ public class OpusPackets {
     }
 
     /**
-     * Create empty {@code OpusPacket} from TOC byte.
+     * Create an empty {@code OpusPacket} from TOC byte.
      *
      * @param toc the TOC byte
+     * @return the OpusPacket object
      */
     public static OpusPacket newPacketOfToc(int toc) {
         int code = toc & 0x03;
@@ -35,7 +39,8 @@ public class OpusPackets {
     }
 
     /**
-     * Parse Opus packets from the binary data. The first {@code (streamCount - 1)} packets must be in
+     * Parse Opus packets from the binary data that contains {@code streamCount} packets. The first
+     * {@code (streamCount - 1)} packets must be in
      * <a href="https://tools.ietf.org/html/rfc6716#appendix-B">self-delimiting format</a> format. The last packet
      * must be in <a href=https://tools.ietf.org/html/rfc6716#section-3.2>standard Opus packet format</a>.
      *
