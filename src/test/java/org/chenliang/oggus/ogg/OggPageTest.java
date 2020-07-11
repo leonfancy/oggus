@@ -71,7 +71,6 @@ class OggPageTest {
     @Test
     void should_dump_ogg_page_to_byte_array() {
         OggPage oggPage = OggPage.empty();
-        oggPage.setVersion(0);
         oggPage.setFlag((byte) 0x01);
         oggPage.setGranulePosition(257);
         oggPage.setSerialNum(0xffffffff);

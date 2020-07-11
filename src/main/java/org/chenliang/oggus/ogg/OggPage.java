@@ -10,6 +10,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Ogg page that defined by <a href="https://tools.ietf.org/html/rfc3533">RFC3533</a>.
+ *
+ * <p>Create a new OggPage object with static method: {@link OggPage#empty()}. Call set...() methods to set fields of
+ * Ogg page.
+ */
 public class OggPage {
     public static final byte[] CAPTURE_PATTERN = {'O', 'g', 'g', 'S'};
     public static final int MAX_LACE_VALUE = 255;
@@ -25,16 +31,20 @@ public class OggPage {
     private OggPage() {
     }
 
+    /**
+     * @return a new {@code OggPage} object with fields unset
+     */
     public static OggPage empty() {
         return new OggPage();
     }
 
+    /**
+     * Get the Ogg page spec version, currently only version 0 is supported.
+     *
+     * @return version number
+     */
     public int getVersion() {
         return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
     }
 
     public void setFlag(byte flag) {

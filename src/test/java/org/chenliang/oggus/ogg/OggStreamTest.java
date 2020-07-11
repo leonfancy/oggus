@@ -107,7 +107,6 @@ class OggStreamTest {
 
     private OggPage createOggPage() {
         OggPage oggPage = OggPage.empty();
-        oggPage.setVersion(0);
         oggPage.setFlag((byte) 0x00);
         oggPage.setGranulePosition(257);
         oggPage.setSerialNum(1);
