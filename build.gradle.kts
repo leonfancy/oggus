@@ -6,12 +6,12 @@ plugins {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_1_8
     withJavadocJar()
     withSourcesJar()
 }
 
-version = "1.0.0"
+version = "1.1.0"
 group = "org.chenliang.oggus"
 
 repositories {
