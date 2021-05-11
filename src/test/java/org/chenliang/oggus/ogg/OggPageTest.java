@@ -74,7 +74,6 @@ class OggPageTest {
         oggPage.setGranulePosition(257);
         oggPage.setSerialNum(0xffffffff);
         oggPage.setSeqNum(1025);
-        oggPage.setCheckSum(0);
 
         byte[] dataPacket1 = TestUtil.createBinary(456, (byte) 1);
         oggPage.addDataPacket(dataPacket1);
@@ -90,7 +89,7 @@ class OggPageTest {
                 1, 1, 0, 0, 0, 0, 0, 0,
                 (byte) 255, (byte) 255, (byte) 255, (byte) 255,
                 1, 4, 0, 0,
-                0, 0, 0, 0,
+                0x2e, 0x36, (byte) 0x83, (byte) 0x97,
                 3, (byte) 255, (byte) 201, (byte) 255};
         byte[] expectedBytes = Bytes.concat(headerBytes, dataPacket1, dataPacket2);
 
@@ -127,5 +126,20 @@ class OggPageTest {
         });
 
         assertEquals("Not a partial data packet", exception.getMessage());
+    }
+
+    @Test
+    void should_calculate_checksum_when_get_checksum_if_checksum_is_not_set() {
+        OggPage oggPage = OggPage.empty();
+        int checkSum = oggPage.getCheckSum();
+        assertEquals(-1633573615, checkSum);
+    }
+
+    @Test
+    void should_not_calculate_checksum_when_get_checksum_if_checksum_is_already_set() {
+        OggPage oggPage = OggPage.empty();
+        oggPage.setCheckSum(222);
+        int checkSum = oggPage.getCheckSum();
+        assertEquals(222, checkSum);
     }
 }

@@ -111,7 +111,6 @@ class OggStreamTest {
         oggPage.setGranulePosition(257);
         oggPage.setSerialNum(1);
         oggPage.setSeqNum(1);
-        oggPage.setCheckSum(0);
 
         oggPage.addDataPacket(TestUtil.createBinary(456, (byte) 1));
         oggPage.addPartialDataPacket(TestUtil.createBinary(255, (byte) 2));

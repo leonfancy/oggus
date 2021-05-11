@@ -2,6 +2,7 @@ package org.chenliang.oggus.ogg;
 
 import com.google.common.io.LittleEndianDataOutputStream;
 import com.google.common.primitives.Bytes;
+import org.chenliang.oggus.util.CRCUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -150,11 +151,24 @@ public class OggPage {
         this.seqNum = seqNum;
     }
 
+    /**
+     * Will calculate the checksum if the checksum is zero.
+     *
+     * @return the checksum
+     */
     public int getCheckSum() {
+        if (checkSum == 0) {
+            byte[] dataDump = dump0();
+            checkSum = CRCUtil.getCRC(dataDump);
+        }
         return checkSum;
     }
 
-    public void setCheckSum(int checkSum) {
+    /**
+     * Oggus library users are not allowed to set checksum manually. Checksum will be automatically calculated when
+     * <code>getCheckSum()</code> or <code>dump()</code> is called.
+     */
+    void setCheckSum(int checkSum) {
         this.checkSum = checkSum;
     }
 
@@ -167,7 +181,7 @@ public class OggPage {
     }
 
     /**
-     * Check whether the last page is completed in this page.
+     * Check whether the last data packet is completed in this page.
      *
      * @return true if the last data packet is completed in this page.
      */
@@ -207,10 +221,19 @@ public class OggPage {
 
     /**
      * Dump the Ogg page to binary. This method could be used to create a binary Ogg stream.
+     * Will calculate the checksum if the checksum is zero.
      *
      * @return the dumped binary byte array
      */
     public byte[] dump() {
+        if (checkSum == 0) {
+            byte[] dataDump = dump0();
+            checkSum = CRCUtil.getCRC(dataDump);
+        }
+        return dump0();
+    }
+
+    private byte[] dump0() {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         LittleEndianDataOutputStream out = new LittleEndianDataOutputStream(byteArrayOutputStream);
 
