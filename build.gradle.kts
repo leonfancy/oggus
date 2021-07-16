@@ -11,7 +11,6 @@ java {
     withSourcesJar()
 }
 
-version = "1.1.0"
 group = "org.chenliang.oggus"
 
 repositories {
