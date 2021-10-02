@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import org.chenliang.oggus.ogg.OggPage;
 import org.chenliang.oggus.ogg.OggStream;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -29,7 +30,7 @@ import java.util.Queue;
  * 'Beginning Of Stream'
  * </pre>
  */
-public class OggOpusStream {
+public class OggOpusStream implements Closeable {
     private final CommentHeader commentHeader;
     private final IdHeader idHeader;
     private final OggStream oggStream;
@@ -135,6 +136,16 @@ public class OggOpusStream {
             }
         }
         return AudioDataPacket.from(data, idHeader.getStreamCount());
+    }
+
+    /**
+     * Close the underlying {@link OggStream}
+     *
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    public void close() throws IOException {
+        oggStream.close();
     }
 
     private IdHeader readIdHeader(OggStream oggStream) throws IOException {
