@@ -2,17 +2,13 @@ package org.chenliang.oggus.ogg;
 
 import com.google.common.io.LittleEndianDataInputStream;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * An Ogg stream is made up of a sequence of Ogg pages. An Ogg stream stream could be multiplexed by several logical
  * Ogg stream which could be identified with the {@code serialNum}.
  */
-public class OggStream {
+public class OggStream implements Closeable {
     private LittleEndianDataInputStream in;
 
     private OggStream(InputStream inputStream) {
@@ -70,6 +66,16 @@ public class OggStream {
             }
         }
         return null;
+    }
+
+    /**
+     * Close the underlying {@link LittleEndianDataInputStream}
+     *
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    public void close() throws IOException {
+        in.close();
     }
 
     private boolean hasNextPage() throws IOException {
